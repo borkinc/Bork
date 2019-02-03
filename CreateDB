@@ -1,7 +1,7 @@
 CREATE TABLE Users (
     uid SERIAL PRIMARY KEY,
     username varchar(30) UNIQUE NOT NULL,
-    hashed_password varchar(50) NOT NULL,
+    hashed_password varchar(100) NOT NULL,
     created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
