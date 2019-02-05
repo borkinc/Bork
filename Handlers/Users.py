@@ -3,6 +3,10 @@ import psycopg2
 from config.dbconfig import pg_config
 
 
+"""
+Working on in house ORM but will be abandoned sadly
+"""
+
 class Model:
 
     def __init__(self, **kwargs):
@@ -40,7 +44,8 @@ class Model:
         if kwargs:
             where = 'where '
             for field, value in kwargs.items():
-                if len(field.split('__')) > 1
+                if len(field.split('__')) > 1:
+                    pass
         else:
             where = ''
         select_str = "Select * from " + self.__class__.__name__.lower()
