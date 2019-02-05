@@ -1,2 +1,11 @@
 flask
 flask-restful
+click
+Flask
+Flask-HTTPAuth
+itsdangerous
+Jinja2
+MarkupSafe
+passlib
+Werkzeug
+Flask-Cors
