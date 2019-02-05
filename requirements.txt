@@ -1,11 +1,5 @@
-flask
-flask-restful
-click
 Flask
-Flask-HTTPAuth
-itsdangerous
-Jinja2
-MarkupSafe
-passlib
-Werkzeug
+psycopg2
+gunicorn
+flask_bcrypt
 Flask-Cors
