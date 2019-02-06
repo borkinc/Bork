@@ -1,25 +1,29 @@
-#root {
-    background-image: url("../img/dog.svg");
+.UserAuth-logo {
+    width: 30em;
+    height: 20em;
+    display: block;
+    margin: auto;
+    /*background-image: url("../img/dog.svg");*/
+    /*!*height: 100%;*!*/
+    /*background-position: top;*/
+    /*background-repeat: no-repeat;*/
+    /*background-size: cover;*/
+    /*width: 300px;*/
     /*height: 100%;*/
-    background-position: top;
-    background-repeat: no-repeat;
-    background-size: 15%;
+    /*position: absolute;*/
+    /*top: 0;*/
+    /*left: 0;*/
 }
 
-.App {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+/*.App {*/
+/*display: flex;*/
+/*justify-content: center;*/
+/*align-items: center;*/
+/*}*/
 
 .UserAuth-tabs {
-    width: auto;
-    margin-top: 15%;
-    /*position: absolute;*/
-    /*margin: 0 auto;*/
-    /*top: 50%;*/
-    /*left: 50%;*/
-    /*transform: translate(-50%, -50%);*/
+    position: relative;
+    top: -20%;
 }
 
 .login {
