@@ -60,12 +60,17 @@ def chats():
     :return:
     """
     if request.method == 'GET':
-        return jsonify(chats={'id': 1, 'chat_name': 'skiribops'}), 200
+        chats = [
+            {"id": 1, "chat_name": "skiribops"},
+            {"id": 2, "chat_name": "Subscribe to PewDiePie"},
+            {"id": 3, "chat_name": "DB"}
+        ]
+        return jsonify(results=chats), 200
 
     elif request.method == 'POST':
         chat_name = request.form['chat_name']
         owner_id = request.form['uid']
-        return jsonify(chat={'id':2, 'chat_name':chat_name}, msg='Success'), 201
+        return jsonify(chat={'id': 2, 'chat_name': chat_name}, msg='Success'), 201
 
 
 @app.route('/api/chats/<int:cid>', methods=['GET'])

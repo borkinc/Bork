@@ -16,6 +16,7 @@ import {
     NavbarToggler,
     NavItem
 } from "reactstrap";
+import axios from "axios";
 
 export default class Chats extends Component {
 
@@ -25,7 +26,10 @@ export default class Chats extends Component {
         this.toggleNavbar = this.toggleNavbar.bind(this);
         this.state = {
             collapsed: true,
-            modal: false
+            modal: false,
+            chats: [],
+            isLoading: true,
+            errors: null
         };
         this.toggle = this.toggle.bind(this);
     }
@@ -42,6 +46,37 @@ export default class Chats extends Component {
         }));
     }
 
+    componentDidMount() {
+        axios
+            .get("http://localhost:5000/api/chats")
+            .then(response =>
+                response.data.results.map(chat => ({
+                    name: `${chat.chat_name}`,
+                    id: `${chat.id}`,
+                }))
+            )
+            .then(chats => {
+                this.setState({
+                    chats,
+                    isLoading: false
+                });
+            })
+            .catch(error => this.setState({error, isLoading: false}));
+    }
+
+    //
+    //
+    //
+    // renderChats() {
+    //     return this.state.chats.map((chat) => {
+    //         return (
+    //             <ListGroupItem className="justify-content-between" tag="button"
+    //                            action key={chat}>{chat.chat_name}<Badge
+    //                 pill>0</Badge></ListGroupItem>
+    //         );
+    //     })
+    // }
+    //
     render() {
         return (
             <div>
@@ -90,15 +125,34 @@ export default class Chats extends Component {
                     </Collapse>
                 </Navbar>
                 <ListGroup>
-                    <ListGroupItem className="justify-content-between" active tag="button" action>Cras justo odio <Badge
-                        pill>14</Badge></ListGroupItem>
-                    <ListGroupItem className="justify-content-between" tag="button" action>Dapibus ac facilisis
-                        in <Badge
-                            pill>2</Badge></ListGroupItem>
-                    <ListGroupItem className="justify-content-between" tag="button" action>Morbi leo risus <Badge
-                        pill>1</Badge></ListGroupItem>
+                    {!this.state.isLoading ? (
+                        this.state.chats.map(chat => {
+                            return (<ListGroupItem className="justify-content-between" tag="button"
+                                                   action key={chat.id}>{chat.name}<Badge
+                                pill>0</Badge></ListGroupItem>);
+                        })
+                    ) : (<p>Loading......</p>)}
+                    {/*{this.renderChats()}*/}
+                    {/*{this.state.chats.map((item) => (*/}
+                    {/*<ListGroupItem className="justify-content-between" active tag="button"*/}
+                    {/*action>{item.chat_name}<Badge*/}
+                    {/*pill>0</Badge></ListGroupItem>))}*/}
+                    {/*{this.state.chats.map((item) => ({*/}
+                    {/*const {chat_name} = chat;*/}
+                    {/*return (*/}
+
+                    {/*)*/}
+                    {/*}))}*/}
+                    {/*<ListGroupItem className="justify-content-between" active tag="button" action>Cras justo odio <Badge*/}
+                    {/*pill>14</Badge></ListGroupItem>*/}
+                    {/*<ListGroupItem className="justify-content-between" tag="button" action>Dapibus ac facilisis*/}
+                    {/*in <Badge*/}
+                    {/*pill>2</Badge></ListGroupItem>*/}
+                    {/*<ListGroupItem className="justify-content-between" tag="button" action>Morbi leo risus <Badge*/}
+                    {/*pill>1</Badge></ListGroupItem>*/}
                 </ListGroup>
             </div>
         );
     }
+
 }
