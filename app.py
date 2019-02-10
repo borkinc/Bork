@@ -69,12 +69,16 @@ def contacts(uid):
     if GET
     :param uid: user id de quien quieres la lista
     :return:
+
+    if POST
+    add a user to the contact del uid en el url
     """
     if request.method == 'GET':
         return jsonify(contacts=[{'uid': 3}, {'uid': 4}]), 200
     else:
         uid_to_add = request.form['uid']
         return jsonify(msg='added'), 201
+
 
 
 if __name__ == '__main__':
