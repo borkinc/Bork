@@ -79,7 +79,13 @@ def contacts(uid):
         uid_to_add = request.form['uid']
         return jsonify(msg='added'), 201
 
-
+@app.route('/chats/<int:cid>/messages')
+def messages():
+    if request.method == 'GET':
+        return jsonify()
+    else:
+        #add message to chat
+        pass
 
 if __name__ == '__main__':
     app.run()
