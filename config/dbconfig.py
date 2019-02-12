@@ -1,5 +1,5 @@
 pg_config = {
-    'user' : 'postgres',
-    'passwd' : 'postgres',
+    'user' : 'borker',
+    'passwd' : 'borker!@',
     'dbname' : 'Bork'
 }
