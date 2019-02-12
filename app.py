@@ -1,7 +1,8 @@
 import bcrypt as bcrypt
 from flask import Flask, request, jsonify
 
-from Handlers.Users import Users
+from Handlers.Chat import ChatHandler
+from Handlers.Users import UserHandler
 
 app = Flask(__name__)
 
@@ -18,10 +19,7 @@ def create_user():
     :return: json containing username and success
     """
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        return jsonify(username=username, msg='Success'), 201
+        return UserHandler().insert_user(request), 201
     return jsonify(msg='Error'), 500
 
 
@@ -32,10 +30,7 @@ def login():
     :return:
     """
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        # get the user with this username
-        return jsonify(user={'username': username}), 200
+        return UserHandler().get_user(request), 200
 
 
 @app.route('/chats', methods=['GET', 'POST'])
@@ -49,18 +44,16 @@ def chats():
     :return:
     """
     if request.method == 'GET':
-        return jsonify(chats={'id': 1, 'chat_name': 'skiribops'}), 200
+        return ChatHandler().get_chats(request), 200
 
     elif request.method == 'POST':
-        chat_name = request.form['chat_name']
-        owner_id = request.form['uid']
-        return jsonify(chat={'id':2, 'chat_name':chat_name}, msg='Success'), 201
+        return ChatHandler().insert_chat(request), 201
 
 
 @app.route('/chats/<int:cid>', methods=['GET'])
 def chatByID(cid):
     if request.method == 'GET':
-        return jsonify(chat={'id': cid, 'chat_name': 'skiribops'}), 200
+        return ChatHandler().get_chat(request), 200
 
 
 @app.route('/contacts/<int:uid>', methods=['GET', 'POST'])
@@ -74,18 +67,18 @@ def contacts(uid):
     add a user to the contact del uid en el url
     """
     if request.method == 'GET':
-        return jsonify(contacts=[{'uid': 3}, {'uid': 4}]), 200
+        return UserHandler().get_contacts(request), 200
     else:
         uid_to_add = request.form['uid']
-        return jsonify(msg='added'), 201
+        return UserHandler().insert_contact(request), 201
 
 @app.route('/chats/<int:cid>/messages')
 def messages():
     if request.method == 'GET':
-        return jsonify()
+        return ChatHandler().get_chat_messages(request), 200
     else:
         #add message to chat
-        pass
+        return ChatHandler().insert_chat_message(request), 201
 
 if __name__ == '__main__':
     app.run()
