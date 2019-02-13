@@ -1,4 +1,3 @@
-
 class UserHandler:
 
     def get_user(self, uid):
