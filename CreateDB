@@ -1,0 +1,53 @@
+CREATE TABLE Users (
+    uid SERIAL PRIMARY KEY,
+    username varchar(30) UNIQUE NOT NULL,
+    hashed_password varchar(100) NOT NULL,
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Chat_Group (
+    cid serial PRIMARY KEY,
+    owner_id INTEGER REFERENCES Users(uid),
+    name varchar(20) NOT NULL
+);
+
+CREATE TABLE Chat_Members (
+    cid INTEGER REFERENCES Chat_Group(cid),
+    uid INTEGER REFERENCES Users(uid)
+);
+
+CREATE TABLE Parcels (
+    pid serial PRIMARY KEY,
+    cid INTEGER REFERENCES Chat_Group(cid),
+    uid INTEGER REFERENCES Users(uid),
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Photos (
+    image bytea not null,
+    caption varchar(1000) not null
+) INHERITS(Parcels);
+
+CREATE TABLE Messages (
+    content varchar(1000) not null
+) INHERITS(Parcels);
+
+CREATE TABLE Replies (
+    reply_to INTEGER REFERENCES Parcels(pid)
+) INHERITS(Parcels);
+
+CREATE TABLE Photo_Likes(
+    pid INTEGER REFERENCES Parcels(pid),
+    uid INTEGER REFERENCES Users(uid)
+);
+
+CREATE TABLE Contacts(
+    owner_id Integer REFERENCES  Users(uid),
+    contact_id Integer REFERENCES Users(uid)
+);
+
+CREATE TABLE Hashtags(
+    hashtag varchar(50) not null,
+    uid Integer REFERENCES Users(uid),
+    pid Integer references Parcels(pid)
+);
