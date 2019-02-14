@@ -5,13 +5,11 @@ from flask import jsonify
 class UserHandler:
 
     def get_user(self, request):
-        return {'username': request.form['username']}
+        return jsonify(user={'username': request.form['username']})
 
     def get_contacts(self, request):
-        pass
-
-    def get_user_contacts(self, request):
-        pass
+        contacts = []
+        contacts.append({'cid'})
 
     def insert_user(self, request):
         username = request.form['username']
