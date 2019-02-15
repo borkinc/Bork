@@ -1,3 +1,5 @@
+import datetime
+
 import bcrypt as bcrypt
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -70,13 +72,45 @@ class Chats(Resource):
 class Chat(Resource):
 
     def get(self, chat_id):
-        chat = {
-            "text": "This is a test message!",
-            "member": {
-                "id": 1
+        """
+        Gets all messages from given chat id.
+        :param chat_id: id of the chat messages are to be extracted from
+        :return: JSON representation of messages table
+        """
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p")
+        messages = [
+            {
+                'mid': '1',
+                'uid': '1',
+                'message': 'This is a test message!',
+                'created_on': current_time
+            },
+            {
+                'mid': '2',
+                'uid': '2',
+                'message': "Hello test message, this is chat",
+                'created_on': current_time
+            },
+            {
+                'mid': '3',
+                'uid': '3',
+                'message': "Hello chat, this is person",
+                'created_on': current_time
+            },
+            {
+                'mid': '4',
+                'uid': '4',
+                'message': "Hello person, this is other person",
+                'created_on': current_time
+            },
+            {
+                'mid': '5',
+                'uid': '5',
+                'message': "Hello other person, this is patrick",
+                'created_on': current_time
             }
-        }
-        return jsonify(chat=chat)
+        ]
+        return jsonify(chat=messages)
 
 
 # @app.route('/api/chats', methods=['GET', 'POST'])
