@@ -9,7 +9,7 @@ class UserHandler:
 
     def get_contacts(self, request):
         contacts = []
-        contacts.append({'cid'})
+        contacts.append({'cid': 3, 'uid': 4})
 
     def insert_user(self, request):
         username = request.form['username']

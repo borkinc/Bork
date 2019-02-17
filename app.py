@@ -72,13 +72,67 @@ def contacts(uid):
         uid_to_add = request.form['uid']
         return UserHandler().insert_contact(request), 201
 
+
 @app.route('/chats/<int:cid>/messages')
 def messages():
     if request.method == 'GET':
         return ChatHandler().get_chat_messages(request), 200
     else:
-        #add message to chat
+        # add message to chat
         return ChatHandler().insert_chat_message(request), 201
+
+
+# ------------------------statistics-------------------------------
+
+@app.route('/stats/trending')
+def trending_topics():
+    pass
+
+
+@app.route('stats/posts')
+def num_of_posts():
+    pass
+
+
+@app.route('/stats/likes')
+def num_of_likes():
+    pass
+
+
+@app.route('/stats/replies')
+def num_of_likes():
+    pass
+
+
+@app.route('/stats/dislikes')
+def num_of_dislikes():
+    pass
+
+
+@app.route('/stats/active')
+def active_users():
+    pass
+
+
+@app.route('/stats/users/<int:uid>/messages')
+def num_of_mess_per_day(uid):
+    pass
+
+
+@app.route('/stats/photos/<int:pid>/replies')
+def num_of_replies_photo(pid):
+    pass
+
+
+@app.route('/stats/photos/<int:pid>/likes')
+def num_of_likes_photos(pid):
+    pass
+
+
+@app.route('/stats/photos/<int:pid>/dislikes')
+def num_of_dislikes_photos(pid):
+    pass
+
 
 if __name__ == '__main__':
     app.run()
