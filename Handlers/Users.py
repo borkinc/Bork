@@ -1,6 +1,4 @@
-import datetime
-
-import jwt
+import bcrypt
 
 
 class UserHandler:
@@ -22,25 +20,9 @@ class UserHandler:
         :param password: hashed password
         :return: user id from database
         """
-        token = self.encode_auth_token(10)
-        return 10, token
+        # token = self.encode_auth_token(10)
+        return 10
 
-    def encode_auth_token(self, user_id):
-        """
-        Generates the Auth Token
-        :return: string
-        """
-        from app import app
-        try:
-            payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=5),
-                'iat': datetime.datetime.utcnow(),
-                'sub': user_id
-            }
-            return jwt.encode(
-                payload,
-                app.config.get('SECRET_KEY'),
-                algorithm='HS256'
-            )
-        except Exception as e:
-            return e
+    def get_user_by_username(self, username):
+        password = bcrypt.hashpw('password'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        return {'username': username, 'uid': 1, 'password': password}

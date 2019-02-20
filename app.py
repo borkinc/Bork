@@ -1,87 +1,20 @@
-import bcrypt as bcrypt
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
 from flask_cors import CORS
-from flask_restful import Resource
+from flask_jwt_extended import JWTManager
+from flask_restful import Api
 
-from Handlers.Chat import ChatHandler
-from Handlers.Users import UserHandler
+from resources import UserRegistration, TokenRefresh, UserLogin, Chats
 
 app = Flask(__name__)
 app.config.from_object('config.config.BaseConfig')
-print(app.config['SECRET_KEY'])
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-
-DUMMY_DATA = {
-    'register': {
-        'username': 'test',
-        'msg': 'success'
-    },
-    'login': {
-        'is_authenticated': True
-    }
-}
+api = Api(app, prefix='/api')
+jwt = JWTManager(app)
 
 
 @app.route('/', methods=['GET'])
 def index():
     return jsonify(welcome='Hello World')
-
-
-@app.route('/api/register', methods=['POST'])
-def create_user():
-    """
-    Creates user with given username, email and password to be stored in database
-    :return: json
-    """
-    if request.method == 'POST':
-        username = 'new_user'
-        email = 'new_user@bork.com'
-        password = 'password'
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        user_id, token = UserHandler().insert_user(username=username, email=email, password=hashed_password)
-        user = {'uid': user_id, 'username': username, 'auth': token.decode('utf-8'), 'msg': 'Success'}
-        return jsonify(user=user), 201
-    return jsonify(msg='Error'), 500
-
-
-@app.route('/api/login', methods=['POST'])
-def login():
-    """
-
-    :return:
-    """
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        # get the user with this username
-        return jsonify(user={'username': 'test'}, is_authenticated=True), 200
-
-
-class Chats(Resource):
-
-    def get(self):
-        return ChatHandler().get_chats()
-
-    def post(self):
-        chat = {'id': 2, 'chat_name': 'Videout'}
-        return jsonify(chat=chat, msg='Success')
-
-
-class Chat(Resource):
-
-    def get(self, chat_id):
-        """
-        Gets all messages from given chat id.
-        :param chat_id: id of the chat messages are to be extracted from
-        :return: JSON representation of messages table
-        """
-        return ChatHandler().get_chat(chat_id)
-
-
-class ChatMessages(Resource):
-
-    def get(self):
-        pass
 
 
 # @app.route('/api/chats', methods=['GET', 'POST'])
@@ -140,8 +73,12 @@ class ChatMessages(Resource):
 #         pass
 
 # api.add_resource(User, '/user')
-# api.add_resource(Chats, '/chats')
+
 # api.add_resource(Chat, '/chat/<int:chat_id>')
+api.add_resource(UserRegistration, '/register')
+api.add_resource(UserLogin, '/login')
+api.add_resource(Chats, '/chats')
+api.add_resource(TokenRefresh, '/token/refresh')
 
 if __name__ == '__main__':
     app.run(debug=True)
