@@ -16,6 +16,4 @@ In this phase there is **no interaction** with the database server!
  
 ## Installation
 
-Use secrets module to generate SECRET_KEY
-
 ## Authors and acknowledgment

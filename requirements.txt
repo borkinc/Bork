@@ -1,9 +1,5 @@
 Flask
 psycopg2
 gunicorn
-Flask-Bcrypt
+flask_bcrypt
 Flask-Cors
-Flask-RESTful
-flask-jwt-extended
-passlib
-

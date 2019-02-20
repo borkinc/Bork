@@ -51,9 +51,3 @@ CREATE TABLE Hashtags(
     uid Integer REFERENCES Users(uid),
     pid Integer references Parcels(pid)
 );
-
-CREATE TABLE UserAuth(
-    auth_id SERIAL PRIMARY_KEY,
-    revoked_token varchar(200),
-    uid INTEGER REFERENCES Users(uid)
-);
