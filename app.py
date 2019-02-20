@@ -1,13 +1,15 @@
-import datetime
-
 import bcrypt as bcrypt
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_restful import Api, Resource
+from flask_restful import Resource
+
+from Handlers.Chat import ChatHandler
+from Handlers.Users import UserHandler
 
 app = Flask(__name__)
+app.config.from_object('config.config.BaseConfig')
+print(app.config['SECRET_KEY'])
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-api = Api(app, prefix='/api')
 
 DUMMY_DATA = {
     'register': {
@@ -20,24 +22,25 @@ DUMMY_DATA = {
 }
 
 
-class HelloWorld(Resource):
-
-    def get(self):
-        return {'hello': 'world'}
+@app.route('/', methods=['GET'])
+def index():
+    return jsonify(welcome='Hello World')
 
 
 @app.route('/api/register', methods=['POST'])
 def create_user():
     """
     Creates user with given username, email and password to be stored in database
-    :return: json containing username and success
+    :return: json
     """
     if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
+        username = 'new_user'
+        email = 'new_user@bork.com'
+        password = 'password'
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        return jsonify(username='test', msg='Success'), 201
+        user_id, token = UserHandler().insert_user(username=username, email=email, password=hashed_password)
+        user = {'uid': user_id, 'username': username, 'auth': token.decode('utf-8'), 'msg': 'Success'}
+        return jsonify(user=user), 201
     return jsonify(msg='Error'), 500
 
 
@@ -57,12 +60,7 @@ def login():
 class Chats(Resource):
 
     def get(self):
-        chats = [
-            {"id": 1, "chat_name": "skiribops"},
-            {"id": 2, "chat_name": "Subscribe to PewDiePie"},
-            {"id": 3, "chat_name": "DB"}
-        ]
-        return jsonify(chats=chats)
+        return ChatHandler().get_chats()
 
     def post(self):
         chat = {'id': 2, 'chat_name': 'Videout'}
@@ -77,40 +75,13 @@ class Chat(Resource):
         :param chat_id: id of the chat messages are to be extracted from
         :return: JSON representation of messages table
         """
-        current_time = datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p")
-        messages = [
-            {
-                'mid': '1',
-                'uid': '1',
-                'message': 'This is a test message!',
-                'created_on': current_time
-            },
-            {
-                'mid': '2',
-                'uid': '2',
-                'message': "Hello test message, this is chat",
-                'created_on': current_time
-            },
-            {
-                'mid': '3',
-                'uid': '3',
-                'message': "Hello chat, this is person",
-                'created_on': current_time
-            },
-            {
-                'mid': '4',
-                'uid': '4',
-                'message': "Hello person, this is other person",
-                'created_on': current_time
-            },
-            {
-                'mid': '5',
-                'uid': '5',
-                'message': "Hello other person, this is patrick",
-                'created_on': current_time
-            }
-        ]
-        return jsonify(chat=messages)
+        return ChatHandler().get_chat(chat_id)
+
+
+class ChatMessages(Resource):
+
+    def get(self):
+        pass
 
 
 # @app.route('/api/chats', methods=['GET', 'POST'])
@@ -168,10 +139,9 @@ class Chat(Resource):
 #         # add message to chat
 #         pass
 
-
-api.add_resource(HelloWorld, '/')
-api.add_resource(Chats, '/chats')
-api.add_resource(Chat, '/chat/<int:chat_id>')
+# api.add_resource(User, '/user')
+# api.add_resource(Chats, '/chats')
+# api.add_resource(Chat, '/chat/<int:chat_id>')
 
 if __name__ == '__main__':
     app.run(debug=True)
