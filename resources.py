@@ -7,6 +7,12 @@ from Handlers.Chat import ChatHandler
 from Handlers.Users import UserHandler
 
 
+class Index(Resource):
+
+    def get(self):
+        return jsonify(msg='Hello World')
+
+
 class UserRegistration(Resource):
 
     def post(self):

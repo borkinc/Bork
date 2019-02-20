@@ -1,20 +1,15 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
-from resources import UserRegistration, TokenRefresh, UserLogin, Chats
+from resources import UserRegistration, TokenRefresh, UserLogin, Chats, Index
 
 app = Flask(__name__)
 app.config.from_object('config.config.BaseConfig')
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 api = Api(app, prefix='/api')
 jwt = JWTManager(app)
-
-
-@app.route('/', methods=['GET'])
-def index():
-    return jsonify(welcome='Hello World')
 
 
 # @app.route('/api/chats', methods=['GET', 'POST'])
@@ -75,6 +70,7 @@ def index():
 # api.add_resource(User, '/user')
 
 # api.add_resource(Chat, '/chat/<int:chat_id>')
+api.add_resource(Index, '/')
 api.add_resource(UserRegistration, '/register')
 api.add_resource(UserLogin, '/login')
 api.add_resource(Chats, '/chats')
