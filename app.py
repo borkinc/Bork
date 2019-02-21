@@ -99,52 +99,52 @@ def messages():
 
 @app.route('/stats/trending')
 def trending_topics():
-    pass
+    return ChatHandler().get_trending_hashtags(request), 200
 
 
 @app.route('stats/posts')
 def num_of_posts():
-    pass
+    return ChatHandler().get_num_posts_daily(request), 200
 
 
 @app.route('/stats/likes')
 def num_of_likes():
-    pass
+    return ChatHandler().get_num_likes_daily(request), 200
 
 
 @app.route('/stats/replies')
-def num_of_likes():
-    pass
+def num_of_replies():
+    return ChatHandler().get_num_replies_daily(request), 200
 
 
 @app.route('/stats/dislikes')
 def num_of_dislikes():
-    pass
+    return ChatHandler().get_num_dislikes_daily(request), 200
 
 
 @app.route('/stats/active')
 def active_users():
-    pass
+    return UserHandler().get_daily_active_users(request), 200
 
 
 @app.route('/stats/users/<int:uid>/messages')
 def num_of_mess_per_day(uid):
-    pass
+    return UserHandler().get_num_posts_user(request)
 
 
 @app.route('/stats/photos/<int:pid>/replies')
 def num_of_replies_photo(pid):
-    pass
+    return ChatHandler().get_num_replies_photo(request)
 
 
 @app.route('/stats/photos/<int:pid>/likes')
 def num_of_likes_photos(pid):
-    pass
+    return ChatHandler().get_num_likes_photo(request)
 
 
 @app.route('/stats/photos/<int:pid>/dislikes')
 def num_of_dislikes_photos(pid):
-    pass
+    return ChatHandler().get_num_dislikes_photo(request)
 
 
 if __name__ == '__main__':
