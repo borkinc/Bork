@@ -6,7 +6,7 @@ class BaseConfig(object):
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'bork_bops')
     DEBUG = True
     ENV = 'development'
-    JWT_BLACKLIST_ENABLED = True
+    JWT_BLACKLIST_ENABLED = False
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
 
 
@@ -15,3 +15,4 @@ class ProductionConfig(BaseConfig):
     JWT_SECRET_KEY = 'bork_bops'
     DEBUG = False
     ENV = 'production'
+    JWT_BLACKLIST_ENABLED = True

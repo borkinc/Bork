@@ -1,6 +1,7 @@
 import bcrypt
 from flask import jsonify
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_refresh_token_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_refresh_token_required, get_jwt_identity, \
+    jwt_required
 from flask_restful import Resource, reqparse
 
 from Handlers.Chat import ChatHandler
@@ -65,11 +66,12 @@ class UserLogin(Resource):
             user = {
                 'msg': 'Invalid credentials'
             }
-        return jsonify(user=user)
+        return jsonify(user=user, is_authenticated=is_authenticated)
 
 
 class Chats(Resource):
 
+    @jwt_required
     def get(self):
         return ChatHandler().get_chats()
 
@@ -81,18 +83,19 @@ class Chats(Resource):
 class Chat(Resource):
 
     def get(self, chat_id):
-        """
-        Gets all messages from given chat id.
-        :param chat_id: id of the chat messages are to be extracted from
-        :return: JSON representation of messages table
-        """
         return ChatHandler().get_chat(chat_id)
 
 
 class ChatMessages(Resource):
 
-    def get(self):
-        pass
+    def get(self, chat_id):
+        """
+        Gets all messages from given chat id.
+        :param chat_id: id of the chat messages are to be extracted from
+        :return: JSON representation of messages table
+        """
+        messages = ChatHandler().get_chat_messages(chat_id)
+        return jsonify(messages=messages)
 
 
 class TokenRefresh(Resource):

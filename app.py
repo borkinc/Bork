@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
-from resources import UserRegistration, TokenRefresh, UserLogin, Chats, Index
+from resources import UserRegistration, TokenRefresh, UserLogin, Chats, Index, Chat, ChatMessages
 
 app = Flask(__name__)
 app.config.from_object('config.config.BaseConfig')
@@ -68,11 +68,12 @@ jwt = JWTManager(app)
 
 # api.add_resource(User, '/user')
 
-# api.add_resource(Chat, '/chat/<int:chat_id>')
 api.add_resource(Index, '/')
 api.add_resource(UserRegistration, '/register')
 api.add_resource(UserLogin, '/login')
 api.add_resource(Chats, '/chats')
+api.add_resource(Chat, '/chat/<int:chat_id>')
+api.add_resource(ChatMessages, '/chat/<int:chat_id>/messages')
 api.add_resource(TokenRefresh, '/token/refresh')
 
 if __name__ == '__main__':
