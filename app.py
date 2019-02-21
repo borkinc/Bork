@@ -1,5 +1,8 @@
 import bcrypt as bcrypt
 from flask import Flask, request, jsonify
+
+from Handlers.Chat import ChatHandler
+from Handlers.Users import UserHandler
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -28,11 +31,7 @@ def create_user():
     :return: json containing username and success
     """
     if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        return jsonify(username='test', msg='Success'), 201
+        return UserHandler().insert_user(request), 201
     return jsonify(msg='Error'), 500
 
 
@@ -43,10 +42,7 @@ def login():
     :return:
     """
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        # get the user with this username
-        return jsonify(user={'username': 'test'}, is_authenticated=True), 200
+        return UserHandler().get_user(request), 200
 
 
 @app.route('/api/chats', methods=['GET', 'POST'])
@@ -60,23 +56,16 @@ def chats():
     :return:
     """
     if request.method == 'GET':
-        chats = [
-            {"id": 1, "chat_name": "skiribops"},
-            {"id": 2, "chat_name": "Subscribe to PewDiePie"},
-            {"id": 3, "chat_name": "DB"}
-        ]
-        return jsonify(results=chats), 200
+        return ChatHandler().get_chats(request), 200
 
     elif request.method == 'POST':
-        chat_name = request.form['chat_name']
-        owner_id = request.form['uid']
-        return jsonify(chat={'id': 2, 'chat_name': chat_name}, msg='Success'), 201
+        return ChatHandler().insert_chat(request), 201
 
 
 @app.route('/api/chats/<int:cid>', methods=['GET'])
 def chatByID(cid):
     if request.method == 'GET':
-        return jsonify(chat={'id': cid, 'chat_name': 'skiribops'}), 200
+        return ChatHandler().get_chat(request), 200
 
 
 @app.route('/api/contacts/<int:uid>', methods=['GET', 'POST'])
@@ -90,19 +79,72 @@ def contacts(uid):
     add a user to the contact del uid en el url
     """
     if request.method == 'GET':
-        return jsonify(contacts=[{'uid': 3}, {'uid': 4}]), 200
+        return UserHandler().get_contacts(request), 200
     else:
         uid_to_add = request.form['uid']
-        return jsonify(msg='added'), 201
+        return UserHandler().insert_contact(request), 201
+
 
 
 @app.route('/chats/<int:cid>/messages')
 def messages():
     if request.method == 'GET':
-        return jsonify()
+        return ChatHandler().get_chat_messages(request), 200
     else:
         # add message to chat
-        pass
+        return ChatHandler().insert_chat_message(request), 201
+
+
+# ------------------------statistics-------------------------------
+
+@app.route('/stats/trending')
+def trending_topics():
+    pass
+
+
+@app.route('stats/posts')
+def num_of_posts():
+    pass
+
+
+@app.route('/stats/likes')
+def num_of_likes():
+    pass
+
+
+@app.route('/stats/replies')
+def num_of_likes():
+    pass
+
+
+@app.route('/stats/dislikes')
+def num_of_dislikes():
+    pass
+
+
+@app.route('/stats/active')
+def active_users():
+    pass
+
+
+@app.route('/stats/users/<int:uid>/messages')
+def num_of_mess_per_day(uid):
+    pass
+
+
+@app.route('/stats/photos/<int:pid>/replies')
+def num_of_replies_photo(pid):
+    pass
+
+
+@app.route('/stats/photos/<int:pid>/likes')
+def num_of_likes_photos(pid):
+    pass
+
+
+@app.route('/stats/photos/<int:pid>/dislikes')
+def num_of_dislikes_photos(pid):
+    pass
 
 
 if __name__ == '__main__':
