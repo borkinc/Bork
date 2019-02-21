@@ -75,15 +75,42 @@ class Chats(Resource):
     def get(self):
         return ChatHandler().get_chats()
 
-    def post(self):
-        chat = {'id': 2, 'chat_name': 'Videout'}
-        return jsonify(chat=chat, msg='Success')
+
+class Contacts(Resource):
+
+    def get(self):
+        """
+        Retrieves all contacts from database
+        :return: JSON
+        """
+        return jsonify(contacts=0)
+
+
+class Contact(Resource):
+
+    def get(self, user_id):
+        """
+        Retrieves contact from database for specified user id
+        :return: JSON
+        """
+        return jsonify(contact=0)
+
+    def post(self, user_id):
+        """
+        Adds a new contact for specified user id
+        :return: JSON
+        """
+        return jsonify(contact=0)
 
 
 class Chat(Resource):
 
     def get(self, chat_id):
         return ChatHandler().get_chat(chat_id)
+
+    def post(self):
+        chat = {'id': 2, 'chat_name': 'Videout'}
+        return jsonify(chat=chat, msg='Success')
 
 
 class ChatMessages(Resource):

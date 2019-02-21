@@ -15,7 +15,31 @@ In this phase there is **no interaction** with the database server!
  
  
 ## Installation
+Must have installed **Python3.6**
 
-Use secrets module to generate SECRET_KEY
+Assuming project root
+* MacOs/Ubuntu
+``` Shell
+source venv/bin/activate
+```
+* Windows
+```Shell
+.\venv\Scripts\activate
+```
+```Shell
+pip install -r requirements.txt
+```
+After installing required packages, set the environment variables for SECRET_KEY and JWT_SECRET_KEY
+* MacOs/Ubuntu
+``` Shell
+export SECRET_KEY="YOUR_SECRET_KEY_HERE"
+export JWT_SECRET_KEY="YOUR_SECRET_KEY_HERE"
+```
+* Windows
+```Shell
+set SECRET_KEY="YOUR_SECRET_KEY_HERE"
+set JWT_SECRET_KEY="YOUR_SECRET_KEY_HERE"
+```
+
 
 ## Authors and acknowledgment
