@@ -2,3 +2,4 @@ Flask
 psycopg2
 gunicorn
 flask_bcrypt
+Flask-Cors

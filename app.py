@@ -3,8 +3,20 @@ from flask import Flask, request, jsonify
 
 from Handlers.Chat import ChatHandler
 from Handlers.Users import UserHandler
+from flask_cors import CORS
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+DUMMY_DATA = {
+    'register': {
+        'username': 'test',
+        'msg': 'success'
+    },
+    'login': {
+        'is_authenticated': True
+    }
+}
 
 
 @app.route('/')
@@ -12,10 +24,10 @@ def hello_world():
     return 'Hello World!'
 
 
-@app.route('/register', methods=['POST'])
+@app.route('/api/register', methods=['POST'])
 def create_user():
     """
-    Should create user
+    Creates user with given username, email and password to be stored in database
     :return: json containing username and success
     """
     if request.method == 'POST':
@@ -23,7 +35,7 @@ def create_user():
     return jsonify(msg='Error'), 500
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/api/login', methods=['POST'])
 def login():
     """
 
@@ -33,7 +45,7 @@ def login():
         return UserHandler().get_user(request), 200
 
 
-@app.route('/chats', methods=['GET', 'POST'])
+@app.route('/api/chats', methods=['GET', 'POST'])
 def chats():
     """
     if method == GET
@@ -50,13 +62,13 @@ def chats():
         return ChatHandler().insert_chat(request), 201
 
 
-@app.route('/chats/<int:cid>', methods=['GET'])
+@app.route('/api/chats/<int:cid>', methods=['GET'])
 def chatByID(cid):
     if request.method == 'GET':
         return ChatHandler().get_chat(request), 200
 
 
-@app.route('/contacts/<int:uid>', methods=['GET', 'POST'])
+@app.route('/api/contacts/<int:uid>', methods=['GET', 'POST'])
 def contacts(uid):
     """
     if GET
@@ -71,6 +83,7 @@ def contacts(uid):
     else:
         uid_to_add = request.form['uid']
         return UserHandler().insert_contact(request), 201
+
 
 
 @app.route('/chats/<int:cid>/messages')
