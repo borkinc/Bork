@@ -12,20 +12,20 @@ In this phase there is **no interaction** with the database server! Interactions
  - [x] E-R model, illustrating the data to be stored in the site.
  - [x] Register a user
  - [x] Login with a user
- - [ ] Create dummy chat group
- - [ ] Add user to contacts list based on name, last name, and either phone or email
- - [ ] Add a contact to a chat group
- - [ ] Remove a user from the contacts list
- - [ ] Remove a user from the contacts list
- - [ ] Remove a chat group (only the owner of said chat may execute this operation)
- - [ ] Post photo and message to a chat group. The message may include hashtags
- - [ ] See the photo, the original message that came with the photo, and any replies
- - [ ] Like/Dislike a photo
- - [ ] Reply to messages
+ - [x] Create dummy chat group
+ - [x] Add user to contacts list based on name, last name, and either phone or email
+ - [x] Add a contact to a chat group
+ - [x] Remove a user from chat group
+ - [x] Remove a user from the contacts list
+ - [x] Remove a chat group (only the owner of said chat may execute this operation)
+ - [x] Post photo and message to a chat group. The message may include hashtags
+ - [x] See the photo, the original message that came with the photo, and any replies
+ - [x] Like/Dislike a photo
+ - [x] Reply to messages
  
  #### Optional
  - [ ] Post a video to a group
- - [ ] Run application from the cloud (Heroku, AWS, etc)
+ - [x] Run application from the cloud (Heroku, AWS, etc)
  - [ ] Run on a mobile phone
  
  

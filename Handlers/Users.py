@@ -5,23 +5,39 @@ class UserHandler:
 
     def __init__(self):
         self.password = bcrypt.hashpw('password'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        self.first_name = 'first_name'
+        self.last_name = 'last_name'
+        self.email = 'email'
+        self.phone = '7875555555'
 
     def get_users(self):
         users = [
             {
                 'uid': 1,
                 'username': 'ninja',
-                'password': self.password
+                'password': self.password,
+                'email': self.email,
+                'first_name': self.first_name,
+                'last_name': self.last_name,
+                'phone': self.phone
             },
             {
                 'uid': 2,
                 'username': 'pewdiepie',
-                'password': self.password
+                'password': self.password,
+                'email': self.email,
+                'first_name': self.first_name,
+                'last_name': self.last_name,
+                'phone': self.phone
             },
             {
                 'uid': 3,
                 'username': 'markiplier',
-                'password': self.password
+                'password': self.password,
+                'email': self.email,
+                'first_name': self.first_name,
+                'last_name': self.last_name,
+                'phone': self.phone
             }
         ]
         return users
@@ -30,18 +46,40 @@ class UserHandler:
         user = {
             'uid': 1,
             'username': 'ninja',
-            'password': self.password
+            'password': self.password,
+            'email': self.email,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'phone': self.phone
         }
         return user
 
-    def get_contacts(self, request):
+    def get_contacts(self, user_id):
         contacts = [
-            {'cid': 3, 'uid': 4}
+            {
+                'contact_id': 3,
+                'uid': 4
+            },
+            {
+                'contact_id': 6,
+                'uid': 9
+            }
         ]
         return contacts
 
-    def insert_contact(self, request):
-        pass
+    def insert_contact(self, first_name, last_name, email=None, phone=None):
+        contact = {
+            'contact_id': 3,
+            'uid': 4
+        }
+        return contact
+
+    def update_contact(self, contact_id):
+        contact = {
+            'contact_id': 3,
+            'uid': 4
+        }
+        return contact
 
     def insert_user(self, username, email, password):
         """
@@ -58,3 +96,20 @@ class UserHandler:
         # TODO: Method should be something along the lines of verify_user_password
         password = bcrypt.hashpw('password'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         return {'username': username, 'uid': 1, 'password': password}
+
+    def verify_password(self, username, password):
+        user = self.get_user(username)
+        is_authenticated = bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8'))
+        return user, is_authenticated
+
+    def update_user_username(self, username, new_username):
+        user = self.get_user(username)
+        user['username'] = new_username
+        return user
+
+    def remove_contact(self, contact_id):
+        contact = {
+            'contact_id': 3,
+            'uid': 4
+        }
+        return contact
