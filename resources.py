@@ -17,12 +17,16 @@ class Index(Resource):
 class UserRegistration(Resource):
 
     def post(self):
+        """
+        Registers new user
+        :return: JSON
+        """
         parser = reqparse.RequestParser()
         parser.add_argument('username', help='Username field cannot be blank', required=True)
         parser.add_argument('email', help='Email field cannot be blank', required=True)
         parser.add_argument('password', help='Password field cannot be blank', required=True)
 
-        # Contains actual data
+        # Verifies needed parameters to register users are present
         data = parser.parse_args()
 
         # Dummy data for phase I of project
@@ -45,13 +49,23 @@ class UserRegistration(Resource):
 class UserLogin(Resource):
 
     def post(self):
+        """
+        Logs in existing user
+        :return: JSON
+        """
         parser = reqparse.RequestParser()
         parser.add_argument('username', help='Username field cannot be blank', required=True)
         parser.add_argument('password', help='Password field cannot be blank', required=True)
+
+        # Verifies needed parameters to register users are present
         data = parser.parse_args()
-        username = 'skiri'
+
+        # Dummy data for Phase I
+
+        # TODO: add verify password method.
+        username = 'ninja'
         password = 'password'
-        user = UserHandler().get_user_by_username(username)
+        user = UserHandler().get_user(username)
         is_authenticated = bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8'))
         if is_authenticated:
             access_token = create_access_token(identity=username)
@@ -67,6 +81,30 @@ class UserLogin(Resource):
                 'msg': 'Invalid credentials'
             }
         return jsonify(user=user, is_authenticated=is_authenticated)
+
+
+class Users(Resource):
+
+    @jwt_required
+    def get(self):
+        users = UserHandler().get_users()
+        return jsonify(users=users)
+
+
+class User(Resource):
+
+    @jwt_required
+    def get(self):
+        user = UserHandler().get_user(username='ninja')
+        return jsonify(user=user)
+
+    @jwt_required
+    def post(self):
+        pass
+
+    @jwt_required
+    def put(self):
+        pass
 
 
 class Chats(Resource):

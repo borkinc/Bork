@@ -3,7 +3,8 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
-from resources import UserRegistration, TokenRefresh, UserLogin, Chats, Index, Chat, ChatMessages, Contacts, Contact
+from resources import UserRegistration, TokenRefresh, UserLogin, Chats, Index, Chat, ChatMessages, Contacts, Contact, \
+    Users
 
 app = Flask(__name__)
 app.config.from_object('config.config.BaseConfig')
@@ -67,6 +68,7 @@ def num_of_dislikes_photos(pid):
 api.add_resource(Index, '/')
 api.add_resource(UserRegistration, '/register')
 api.add_resource(UserLogin, '/login')
+api.add_resource(Users, '/users')
 api.add_resource(Chats, '/chats')
 api.add_resource(Contacts, '/contacts')
 api.add_resource(Contact, '/contact/<int:user_id>')

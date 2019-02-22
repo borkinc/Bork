@@ -1,11 +1,38 @@
 import bcrypt
-from flask import jsonify
 
 
 class UserHandler:
 
-    def get_user(self, request):
-        return jsonify(user={'username': request.form['username']})
+    def __init__(self):
+        self.password = bcrypt.hashpw('password'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+    def get_users(self):
+        users = [
+            {
+                'uid': 1,
+                'username': 'ninja',
+                'password': self.password
+            },
+            {
+                'uid': 2,
+                'username': 'pewdiepie',
+                'password': self.password
+            },
+            {
+                'uid': 3,
+                'username': 'markiplier',
+                'password': self.password
+            }
+        ]
+        return users
+
+    def get_user(self, username):
+        user = {
+            'uid': 1,
+            'username': 'ninja',
+            'password': self.password
+        }
+        return user
 
     def get_contacts(self, request):
         contacts = [

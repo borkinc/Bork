@@ -10,8 +10,8 @@ Gain further experience with Web programming concepts including REST and HTTP.
 ### Phase I
 In this phase there is **no interaction** with the database server! Interactions with the server will be made with Postman.
  - [x] E-R model, illustrating the data to be stored in the site.
- - [ ] Register a user
- - [ ] Login with a user
+ - [x] Register a user
+ - [x] Login with a user
  - [ ] Create dummy chat group
  - [ ] Add user to contacts list based on name, last name, and either phone or email
  - [ ] Add a contact to a chat group
