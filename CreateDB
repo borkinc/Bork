@@ -1,25 +1,25 @@
 CREATE TABLE Users (
-    user_id SERIAL PRIMARY KEY,
+    uid SERIAL PRIMARY KEY,
     username varchar(30) UNIQUE NOT NULL,
     hashed_password varchar(100) NOT NULL,
     created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Chat_Group (
-    chat_id serial PRIMARY KEY,
-    owner_id INTEGER REFERENCES Users(user_id),
+    cid serial PRIMARY KEY,
+    owner_id INTEGER REFERENCES Users(uid),
     name varchar(20) NOT NULL
 );
 
 CREATE TABLE Chat_Members (
-    chat_id INTEGER REFERENCES Chat_Group(chat_id),
-    user_id INTEGER REFERENCES Users(user_id)
+    cid INTEGER REFERENCES Chat_Group(cid),
+    uid INTEGER REFERENCES Users(uid)
 );
 
 CREATE TABLE Parcels (
-    parcels_id serial PRIMARY KEY,
-    chat_id INTEGER REFERENCES Chat_Group(chat_id),
-    user_id INTEGER REFERENCES Users(user_id),
+    pid serial PRIMARY KEY,
+    cid INTEGER REFERENCES Chat_Group(cid),
+    uid INTEGER REFERENCES Users(uid),
     created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -33,27 +33,21 @@ CREATE TABLE Messages (
 ) INHERITS(Parcels);
 
 CREATE TABLE Replies (
-    reply_to INTEGER REFERENCES Parcels(parcels_id)
+    reply_to INTEGER REFERENCES Parcels(pid)
 ) INHERITS(Parcels);
 
 CREATE TABLE Photo_Likes(
-    parcels_id INTEGER REFERENCES Parcels(parcels_id),
-    user_id INTEGER REFERENCES Users(user_id)
+    pid INTEGER REFERENCES Parcels(pid),
+    uid INTEGER REFERENCES Users(uid)
 );
 
 CREATE TABLE Contacts(
-    owner_id Integer REFERENCES  Users(user_id),
-    contact_id Integer REFERENCES Users(user_id)
+    owner_id Integer REFERENCES  Users(uid),
+    contact_id Integer REFERENCES Users(uid)
 );
 
 CREATE TABLE Hashtags(
     hashtag varchar(50) not null,
-    user_id Integer REFERENCES Users(user_id),
-    parcels_id Integer references Parcels(parcels_id)
-);
-
-CREATE TABLE UserAuth(
-    auth_id SERIAL PRIMARY_KEY,
-    revoked_token varchar(200),
-    user_id INTEGER REFERENCES Users(user_id)
+    uid Integer REFERENCES Users(uid),
+    pid Integer references Parcels(pid)
 );
