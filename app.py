@@ -19,7 +19,7 @@ def trending_topics():
     pass
 
 
-@app.route('stats/posts')
+@app.route('/stats/posts')
 def num_of_posts():
     pass
 
@@ -30,7 +30,7 @@ def num_of_likes():
 
 
 @app.route('/stats/replies')
-def num_of_likes():
+def num_of_replies():
     pass
 
 
