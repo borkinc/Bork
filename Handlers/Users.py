@@ -1,21 +1,115 @@
 import bcrypt
-from flask import jsonify
 
 
 class UserHandler:
 
-    def get_user(self, request):
-        return jsonify(user={'username': request.form['username']})
+    def __init__(self):
+        self.password = bcrypt.hashpw('password'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        self.first_name = 'first_name'
+        self.last_name = 'last_name'
+        self.email = 'email'
+        self.phone = '7875555555'
 
-    def get_contacts(self, request):
-        contacts = []
-        contacts.append({'cid': 3, 'uid': 4})
+    def get_users(self):
+        users = [
+            {
+                'uid': 1,
+                'username': 'ninja',
+                'password': self.password,
+                'email': self.email,
+                'first_name': self.first_name,
+                'last_name': self.last_name,
+                'phone': self.phone
+            },
+            {
+                'uid': 2,
+                'username': 'pewdiepie',
+                'password': self.password,
+                'email': self.email,
+                'first_name': self.first_name,
+                'last_name': self.last_name,
+                'phone': self.phone
+            },
+            {
+                'uid': 3,
+                'username': 'markiplier',
+                'password': self.password,
+                'email': self.email,
+                'first_name': self.first_name,
+                'last_name': self.last_name,
+                'phone': self.phone
+            }
+        ]
+        return users
 
-    def insert_user(self, request):
-        username = request.form['username']
-        password = request.form['password']
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        return jsonify(username=username, msg='Success'), 201
+    def get_user(self, username):
+        user = {
+            'uid': 1,
+            'username': 'ninja',
+            'password': self.password,
+            'email': self.email,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'phone': self.phone
+        }
+        return user
 
-    def insert_contact(self, request):
-        pass
+    def get_contacts(self, user_id):
+        contacts = [
+            {
+                'contact_id': 3,
+                'uid': 4
+            },
+            {
+                'contact_id': 6,
+                'uid': 9
+            }
+        ]
+        return contacts
+
+    def insert_contact(self, first_name, last_name, email=None, phone=None):
+        contact = {
+            'contact_id': 3,
+            'uid': 4
+        }
+        return contact
+
+    def update_contact(self, contact_id):
+        contact = {
+            'contact_id': 3,
+            'uid': 4
+        }
+        return contact
+
+    def insert_user(self, username, email, password):
+        """
+        Should add user to database
+        :param username: unique username
+        :param email: email of user
+        :param password: hashed password
+        :return: user id from database
+        """
+        # token = self.encode_auth_token(10)
+        return 10
+
+    def get_user_by_username(self, username):
+        # TODO: Method should be something along the lines of verify_user_password
+        password = bcrypt.hashpw('password'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        return {'username': username, 'uid': 1, 'password': password}
+
+    def verify_password(self, username, password):
+        user = self.get_user(username)
+        is_authenticated = bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8'))
+        return user, is_authenticated
+
+    def update_user_username(self, username, new_username):
+        user = self.get_user(username)
+        user['username'] = new_username
+        return user
+
+    def remove_contact(self, contact_id):
+        contact = {
+            'contact_id': 3,
+            'uid': 4
+        }
+        return contact
