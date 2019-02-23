@@ -1,1 +1,1 @@
-$ web: gunicorn bork:app
+$ web: gunicorn app:app
