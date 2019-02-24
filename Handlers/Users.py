@@ -1,4 +1,5 @@
 import bcrypt
+from flask import jsonify
 
 
 class UserHandler:
@@ -113,3 +114,10 @@ class UserHandler:
             'uid': 4
         }
         return contact
+
+    def get_daily_active_users(self, request):
+        users = [{'uid': 2, 'username': 'mark'}, {'uid': 4, 'username': 'Damon'}]
+        return jsonify(result=users)
+
+    def get_num_posts_user(self, request):
+        return jsonify(result=2)
