@@ -41,13 +41,15 @@ class ChatHandler:
         return chat
 
     def get_chat_messages(self, cid):
-        current_time = datetime.datetime.now().strftime('%Y-%m-%d %I:%M %p')
+        current_time = datetime.datetime.now().isoformat()
         messages = [
             {
                 'message_id': '1',
                 'user_id': '1',
                 'message': 'This is a test message!',
                 'created_on': current_time,
+                'likes': [],
+                'dislikes': [],
                 'img': None
             },
             {
@@ -55,6 +57,8 @@ class ChatHandler:
                 'user_id': '2',
                 'message': 'Hello test message, this is chat',
                 'created_on': current_time,
+                'likes': [],
+                'dislikes': [],
                 'img': None
             },
             {
@@ -62,6 +66,8 @@ class ChatHandler:
                 'user_id': '3',
                 'message': 'Hello chat, this is person',
                 'created_on': current_time,
+                'likes': [],
+                'dislikes': [],
                 'img': None
             },
             {
@@ -69,6 +75,8 @@ class ChatHandler:
                 'user_id': '4',
                 'message': 'Hello person, this is other person',
                 'created_on': current_time,
+                'likes': [],
+                'dislikes': [],
                 'img': None
             },
             {
@@ -76,6 +84,8 @@ class ChatHandler:
                 'user_id': '5',
                 'message': 'Hello other person, this is patrick',
                 'created_on': current_time,
+                'likes': [],
+                'dislikes': [],
                 'img': None
             }
         ]
@@ -96,7 +106,9 @@ class ChatHandler:
             'message': 'message',
             'cid': 1,
             'contact_id': 1,
-            'img': _img
+            'likes': [],
+            'dislikes': [],
+            'img': img
         }
         return message
 
@@ -133,24 +145,26 @@ class ChatHandler:
         return chat
 
     def like_chat_message(self, chat_id, message_id):
-        _img = {'src': '/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png', 'likes': 1, 'dislikes': 0}
         message = {
             'message_id': 5,
             'message': 'message',
             'cid': 1,
             'contact_id': 1,
-            'img': _img
+            'likes': [],
+            'dislikes': [],
+            'img': '/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png'
         }
         return message
 
     def dislike_chat_message(self, chat_id, message_id):
-        _img = {'src': '/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png', 'likes': 0, 'dislikes': 1}
         message = {
             'message_id': 5,
             'message': 'message',
             'cid': 1,
             'contact_id': 1,
-            'img': _img
+            'likes': [],
+            'dislikes': [],
+            'img': '/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png'
         }
         return message
 
@@ -165,6 +179,8 @@ class ChatHandler:
             'message': 'message',
             'cid': 1,
             'contact_id': 1,
+            'likes': [],
+            'dislikes': [],
             'img': None,
             'replies': replies
         }
