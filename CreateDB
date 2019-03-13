@@ -3,7 +3,7 @@ CREATE TABLE Users (
     username varchar(30) UNIQUE NOT NULL,
     password varchar(100) NOT NULL,
     created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    email varchar(100) NOT NULL,
+    email varchar(100) UNIQUE NOT NULL,
     first_name varchar(30) NOT NULL,
     last_name varchar(30) NOT NULL,
     phone_number varchar(10) NOT NULL
@@ -22,7 +22,7 @@ CREATE TABLE Chat_Members (
 );
 
 CREATE TABLE Messages (
-    mid serial PRIMARY_KEY,
+    mid serial PRIMARY KEY,
     cid INTEGER REFERENCES Chat_Group(cid),
     uid INTEGER REFERENCES Users(uid),
     created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
