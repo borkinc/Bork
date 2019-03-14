@@ -28,7 +28,7 @@ CREATE TABLE Messages (
     created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE Photos (
+CREATE TABLE Multimedia (
     image BYTEA NOT NULL,
     mid INTEGER REFERENCES Messages(mid)
 );
