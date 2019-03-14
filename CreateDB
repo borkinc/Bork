@@ -25,6 +25,7 @@ CREATE TABLE Messages (
     mid serial PRIMARY KEY,
     cid INTEGER REFERENCES Chat_Group(cid),
     uid INTEGER REFERENCES Users(uid),
+    message VARCHAR(500),
     created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
