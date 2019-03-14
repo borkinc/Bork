@@ -44,8 +44,8 @@ class ChatHandler:
         current_time = datetime.datetime.now().isoformat()
         messages = [
             {
-                'message_id': '1',
-                'user_id': '1',
+                'message_id': 1,
+                'user_id': 1,
                 'message': 'This is a test message!',
                 'created_on': current_time,
                 'likes': [],
@@ -53,8 +53,8 @@ class ChatHandler:
                 'img': None
             },
             {
-                'message_id': '2',
-                'user_id': '2',
+                'message_id': 2,
+                'user_id': 2,
                 'message': 'Hello test message, this is chat',
                 'created_on': current_time,
                 'likes': [],
@@ -62,8 +62,8 @@ class ChatHandler:
                 'img': None
             },
             {
-                'message_id': '3',
-                'user_id': '3',
+                'message_id': 3,
+                'user_id': 3,
                 'message': 'Hello chat, this is person',
                 'created_on': current_time,
                 'likes': [],
@@ -71,8 +71,8 @@ class ChatHandler:
                 'img': None
             },
             {
-                'message_id': '4',
-                'user_id': '4',
+                'message_id': 4,
+                'user_id': 4,
                 'message': 'Hello person, this is other person',
                 'created_on': current_time,
                 'likes': [],
@@ -80,8 +80,8 @@ class ChatHandler:
                 'img': None
             },
             {
-                'message_id': '5',
-                'user_id': '5',
+                'message_id': 5,
+                'user_id': 5,
                 'message': 'Hello other person, this is patrick',
                 'created_on': current_time,
                 'likes': [],
