@@ -18,7 +18,8 @@ CREATE TABLE Chat_Group (
 CREATE TABLE Chat_Members (
     cid INTEGER REFERENCES Chat_Group(cid),
     uid INTEGER REFERENCES Users(uid),
-    joined_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    joined_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(cid, uid)
 );
 
 CREATE TABLE Messages (
@@ -31,7 +32,7 @@ CREATE TABLE Messages (
 
 CREATE TABLE Multimedia (
     image BYTEA NOT NULL,
-    mid INTEGER REFERENCES Messages(mid)
+    mid INTEGER REFERENCES Messages(mid) UNIQUE
 );
 
 CREATE TABLE Replies (
@@ -44,12 +45,14 @@ CREATE TABLE Replies (
 CREATE TABLE Likes(
     mid INTEGER REFERENCES Messages(mid),
     uid INTEGER REFERENCES Users(uid),
-    upvote BOOLEAN NOT NULL
+    upvote BOOLEAN NOT NULL,
+    UNIQUE(mid, uid)
 );
 
 CREATE TABLE Contacts(
     owner_id Integer REFERENCES  Users(uid),
-    contact_id Integer REFERENCES Users(uid)
+    contact_id Integer REFERENCES Users(uid),
+    UNIQUE(owner_id, contact_id)
 );
 
 CREATE TABLE Hashtags(
@@ -59,5 +62,6 @@ CREATE TABLE Hashtags(
 
 CREATE TABLE Hashtags_Messages(
     hid INTEGER REFERENCES Hashtags(hid),
-    mid INTEGER REFERENCES Messages(mid)
+    mid INTEGER REFERENCES Messages(mid),
+    UNIQUE(hid, mid)
 )
