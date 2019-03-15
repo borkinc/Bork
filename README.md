@@ -6,28 +6,6 @@ A simple database application for photo messaging in a social context, like Inst
 * Understand the use of the E-R model for database application design.
 * Gain experience by implementing applications using layers of increasing complexity and fairly complex data structures.
 Gain further experience with Web programming concepts including REST and HTTP.
-
-### Phase I
-In this phase there is **no interaction** with the database server! Interactions with the server will be made with Postman.
- - [x] E-R model, illustrating the data to be stored in the site.
- - [x] Register a user
- - [x] Login with a user
- - [x] Create dummy chat group
- - [x] Add user to contacts list based on name, last name, and either phone or email
- - [x] Add a contact to a chat group
- - [x] Remove a user from chat group
- - [x] Remove a user from the contacts list
- - [x] Remove a chat group (only the owner of said chat may execute this operation)
- - [x] Post photo and message to a chat group. The message may include hashtags
- - [x] See the photo, the original message that came with the photo, and any replies
- - [x] Like/Dislike a photo
- - [x] Reply to messages
- 
- #### Optional
- - [ ] Post a video to a group
- - [x] Run application from the cloud (Heroku, AWS, etc)
- - [ ] Run on a mobile phone
- 
  
 ## Installation
 Must have installed **Python3.6**
@@ -56,6 +34,27 @@ export JWT_SECRET_KEY="YOUR_SECRET_KEY_HERE"
 set SECRET_KEY="YOUR_SECRET_KEY_HERE"
 set JWT_SECRET_KEY="YOUR_SECRET_KEY_HERE"
 ```
+To run app with Development/Production settings, set the environment variable.
+* Development
+  * MacOs/Ubuntu
+    ``` Shell
+    export FLASK_SETTINGS="DevelopmentConfig"
+    ```
+   * Windows
+    ```Shell
+    set FLASK_SETTINGS="DevelopmentConfig"
+    ```
+* Production
+  * MacOs/Ubuntu
+    ``` Shell
+    export FLASK_SETTINGS="ProductionConfig"
+    export DATABASE_URL="DATABASE URL HERE"
+    ```
+   * Windows
+    ```Shell
+    set FLASK_SETTINGS="ProductionConfig"
+    set DATABASE_URL="DATABASE URL HERE"
+    ```
 
 
 ## Authors and acknowledgment
