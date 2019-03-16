@@ -2,15 +2,13 @@ import datetime
 
 from flask import jsonify
 
+from DAO.ChatDAO import ChatDAO
+
 
 class ChatHandler:
 
     def __init__(self):
-        self.participants = [
-            {
-                'contact_id': 1
-            }
-        ]
+        self.chatDAO = ChatDAO()
 
     def get_chats(self):
         chats = [

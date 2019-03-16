@@ -3,16 +3,10 @@
 import psycopg2
 import psycopg2.extras
 
-from config.config import BaseConfig
+from DAO.DAO import DAO
 
 
-class UserDAO:
-
-    def __init__(self):
-        config = BaseConfig()
-
-        self.conn = psycopg2.connect(dbname=config.DBNAME, user=config.USER, password=config.PASSWORD, host=config.HOST,
-                                     port=config.PORT)
+class UserDAO(DAO):
 
     def insert_user(self, username, password, first_name, last_name, email, phone_number):
         cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)

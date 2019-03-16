@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
+from DAO.ChatDAO import ChatDAO
 from Handlers.Chat import ChatHandler
 from Handlers.Users import UserHandler
 from resources import UserRegistration, TokenRefresh, UserLogin, Chats, Index, ChatMessages, Contacts, Users, Chat, \
@@ -67,6 +68,8 @@ def num_of_dislikes_photos(pid):
     return ChatHandler().get_num_dislikes_photo(request)
 
 
+ChatDAO().get_all_messages()
+print('bops')
 api.add_resource(Index, '/')
 api.add_resource(UserRegistration, '/register')
 api.add_resource(UserLogin, '/login')
