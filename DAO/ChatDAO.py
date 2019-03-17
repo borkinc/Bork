@@ -21,12 +21,26 @@ class ChatDAO(DAO):
             messages.append(row)
         return messages
 
+    def get_chat_messages(self, cid):
+        cursor = self.get_cursor()
+        query = "select * from messages where cid = %s order by created_on"
+        cursor.execute(query)
+        messages = [row for row in cursor]
+        return messages
+
     def get_all_chats(self):
         cursor = self.get_cursor()
         query = "select * from chat_group"
         cursor.execute(query)
         chat_groups = [row for row in cursor]
         return chat_groups
+
+    def get_chat(self, cid):
+        cursor = self.get_cursor()
+        query = "select * from chat_group where cid = %s"
+        cursor.execute(query, (cid, ))
+        chat = [row for row in cursor]
+        return chat[0]
 
     def get_members_from_chat(self, cid):
         cursor = self.get_cursor()
@@ -48,3 +62,10 @@ class ChatDAO(DAO):
         cursor.execute(query, (mid, ))
         return cursor[0]
 
+    def insert_chat(self, chat_name, owner_id):
+        cursor = self.get_cursor()
+        query = "insert into chat_group (name, owner_id) values (%s, %s) returning cid"
+        cursor.execute(query, (chat_name, owner_id))
+        cid = cursor.fetchone()[0]
+        self.conn.commit()
+        return cid

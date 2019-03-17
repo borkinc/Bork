@@ -1,6 +1,8 @@
 import bcrypt
 from flask import jsonify
 
+from DAO.UserDAO import UserDAO
+
 
 class UserHandler:
 
@@ -10,6 +12,7 @@ class UserHandler:
         self.last_name = 'last_name'
         self.email = 'email'
         self.phone = '7875555555'
+        self.userDAO = UserDAO()
 
     def get_users(self):
         users = [
@@ -56,17 +59,7 @@ class UserHandler:
         return user
 
     def get_contacts(self, user_id):
-        contacts = [
-            {
-                'contact_id': 3,
-                'uid': 4
-            },
-            {
-                'contact_id': 6,
-                'uid': 9
-            }
-        ]
-        return contacts
+        return self.userDAO.get_contacts(user_id)
 
     def insert_contact(self, first_name, last_name, email=None, phone=None):
         contact = {

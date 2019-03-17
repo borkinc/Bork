@@ -1,5 +1,3 @@
-import datetime
-
 from flask import jsonify
 
 from DAO.ChatDAO import ChatDAO
@@ -11,91 +9,19 @@ class ChatHandler:
         self.chatDAO = ChatDAO()
 
     def get_chats(self):
-        chats = [
-            {
-                'cid': 1,
-                'name': 'skiribops',
-                'participants': self.participants
-            },
-            {
-                'cid': 2,
-                'name': 'Subscribe to PewDiePie',
-                'participants': self.participants
-            },
-            {
-                'cid': 3,
-                'name': 'DB',
-                'participants': self.participants
-            }
-        ]
+        chats = self.chatDAO.get_all_chats()
         return chats
 
     def get_chat(self, cid):
-        chat = {
-            'cid': 1,
-            'name': 'Subscribe to pewdiepie',
-            'participants': self.participants
-        }
+        chat = self.chatDAO.get_chat(cid)
         return chat
 
     def get_chat_messages(self, cid):
-        current_time = datetime.datetime.now().isoformat()
-        messages = [
-            {
-                'message_id': '1',
-                'user_id': '1',
-                'message': 'This is a test message!',
-                'created_on': current_time,
-                'likes': [],
-                'dislikes': [],
-                'img': None
-            },
-            {
-                'message_id': '2',
-                'user_id': '2',
-                'message': 'Hello test message, this is chat',
-                'created_on': current_time,
-                'likes': [],
-                'dislikes': [],
-                'img': None
-            },
-            {
-                'message_id': '3',
-                'user_id': '3',
-                'message': 'Hello chat, this is person',
-                'created_on': current_time,
-                'likes': [],
-                'dislikes': [],
-                'img': None
-            },
-            {
-                'message_id': '4',
-                'user_id': '4',
-                'message': 'Hello person, this is other person',
-                'created_on': current_time,
-                'likes': [],
-                'dislikes': [],
-                'img': None
-            },
-            {
-                'message_id': '5',
-                'user_id': '5',
-                'message': 'Hello other person, this is patrick',
-                'created_on': current_time,
-                'likes': [],
-                'dislikes': [],
-                'img': None
-            }
-        ]
-        return messages
+        return self.chatDAO.get_chat_messages(cid)
 
-    def insert_chat(self, chat_name):
-        chat = {
-            'cid': 1,
-            'name': 'skiribops',
-            'participants': self.participants
-        }
-        return chat
+    def insert_chat(self, chat_name, owner_id):
+        cid = self.chatDAO.insert_chat(chat_name, owner_id)
+        return cid
 
     def insert_chat_message(self, message, img=None):
         _img = {'src': img, 'likes': 0, 'dislikes': 0}
