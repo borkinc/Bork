@@ -66,7 +66,6 @@ def num_of_likes_photos(pid):
 def num_of_dislikes_photos(pid):
     return ChatHandler().get_num_dislikes_photo(request)
 
-
 api.add_resource(Index, '/')
 api.add_resource(UserRegistration, '/register')
 api.add_resource(UserLogin, '/login')

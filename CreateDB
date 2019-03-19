@@ -11,7 +11,7 @@ CREATE TABLE Users (
 
 CREATE TABLE Chat_Group (
     cid serial PRIMARY KEY,
-    owner_id INTEGER REFERENCES Users(uid),
+    uid INTEGER REFERENCES Users(uid),
     name varchar(20) NOT NULL
 );
 
