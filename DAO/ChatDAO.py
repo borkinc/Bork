@@ -4,27 +4,26 @@ from DAO.DAO import DAO
 class ChatDAO(DAO):
 
     def get_all_messages(self):
-        '''
-        yeah this needs some work
-        '''
         cursor = self.get_cursor()
-        query = "select * from messages"
+        query = "with like_count as (select count(*) as likes, mid from likes where upvote = true group by mid), " \
+                "dislike_count as (select count(*) as dislikes, mid from likes where upvote = false group by mid) " \
+                "select message, image, likes, dislikes, username, messages.created_on from messages left outer join " \
+                "like_count on messages.mid = like_count.mid left outer join multimedia on " \
+                "messages.mid = multimedia.mid left outer join dislike_count on messages.mid = dislike_count.mid " \
+                "left outer join users on messages.uid = users.uid"
         cursor.execute(query)
-        messages = []
-        for row in cursor:
-            mid = row['mid']
-            query = "select count(*) filter (where upvote = true) as liked, count(*) filter (where upvote = false) as disliked from likes natural inner join users where mid = %s"
-            new_cursor = self.get_cursor()
-            new_cursor.execute(query, (mid, ))
-            row = dict(row)
-            row.update({'likes': new_cursor.fetchone()[0], 'dislikes': new_cursor.fetchone()[1]})
-            messages.append(row)
+        messages = [row for row in cursor]
         return messages
 
     def get_chat_messages(self, cid):
         cursor = self.get_cursor()
-        query = "select * from messages where cid = %s order by created_on"
-        cursor.execute(query)
+        query = "with like_count as (select count(*) as likes, mid from likes where upvote = true group by mid), " \
+                "dislike_count as (select count(*) as dislikes, mid from likes where upvote = false group by mid) " \
+                "select message, image, likes, dislikes, username, messages.created_on from messages left outer join " \
+                "like_count on messages.mid = like_count.mid left outer join multimedia on " \
+                "messages.mid = multimedia.mid left outer join dislike_count on messages.mid = dislike_count.mid " \
+                "left outer join users on messages.uid = users.uid where messages.cid = %s"
+        cursor.execute(query, (cid, ))
         messages = [row for row in cursor]
         return messages
 
@@ -62,7 +61,23 @@ class ChatDAO(DAO):
         cursor.execute(query, (mid, ))
         return cursor[0]
 
-    def insert_chat(self, chat_name, owner_id):
+    def get_list_of_likers_message(self, mid):
+        cursor = self.get_cursor()
+        query = "select username from Likes left outer join users on likes.uid = users.uid where likes.mid = %s and " \
+                "upvote = true "
+        cursor.execute(query, (mid, ))
+        usernames = [row for row in cursor]
+        return usernames
+
+    def get_list_of_dislikers_message(self, mid):
+        cursor = self.get_cursor()
+        query = "select username from Likes left outer join users on likes.uid = users.uid where likes.mid = %s and " \
+                "upvote = false "
+        cursor.execute(query, (mid, ))
+        usernames = [row for row in cursor]
+        return usernames
+
+    def insert_chat_group(self, chat_name, owner_id):
         cursor = self.get_cursor()
         query = "insert into chat_group (name, owner_id) values (%s, %s) returning cid"
         cursor.execute(query, (chat_name, owner_id))
