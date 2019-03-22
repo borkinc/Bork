@@ -6,7 +6,7 @@ from flask_restful import Api
 from Handlers.Chat import ChatHandler
 from Handlers.Users import UserHandler
 from resources import UserRegistration, TokenRefresh, UserLogin, Chats, Index, ChatMessages, Contacts, Users, Chat, \
-    LikeChatMessage, DislikeChatMessage, ReplyChatMessage
+    LikeChatMessage, DislikeChatMessage, ReplyChatMessage, User, Contact, Messages, Message
 
 app = Flask(__name__)
 app.config.from_object('config.config.BaseConfig')
@@ -66,17 +66,22 @@ def num_of_likes_photos(pid):
 def num_of_dislikes_photos(pid):
     return ChatHandler().get_num_dislikes_photo(request)
 
+
 api.add_resource(Index, '/')
 api.add_resource(UserRegistration, '/register')
 api.add_resource(UserLogin, '/login')
 api.add_resource(Users, '/users')
+api.add_resource(User, '/user')
 api.add_resource(Chats, '/chats')
 api.add_resource(Chat, '/chat/<int:cid>')
 api.add_resource(Contacts, '/contacts')
+api.add_resource(Contact, '/contacts/<int:uid>')
 api.add_resource(ChatMessages, '/chat/<int:chat_id>/messages')
-api.add_resource(LikeChatMessage, '/chat/<int:chat_id>/message/<int:message_id>/like')
-api.add_resource(DislikeChatMessage, '/chat/<int:chat_id>/message/<int:message_id>/dislike')
-api.add_resource(ReplyChatMessage, '/chat/<int:chat_id>/message/<int:message_id>/reply')
+api.add_resource(Messages, '/messages')
+api.add_resource(Message, '/messages/<int:mid>')
+api.add_resource(LikeChatMessage, '/messages/<int:mid>/like')
+api.add_resource(DislikeChatMessage, '/messages/<int:mid>/dislike')
+api.add_resource(ReplyChatMessage, '/messages/<int:mid>/replies')
 api.add_resource(TokenRefresh, '/token/refresh')
 
 if __name__ == '__main__':

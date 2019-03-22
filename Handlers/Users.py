@@ -46,7 +46,7 @@ class UserHandler:
         ]
         return users
 
-    def get_user(self, username):
+    def get_user_by_username(self, username):
         user = {
             'uid': 1,
             'username': 'ninja',
@@ -57,6 +57,9 @@ class UserHandler:
             'phone': self.phone
         }
         return user
+
+    def get_user_by_id(self, uid):
+        return self.userDAO.get_user(uid)
 
     def get_contacts(self, user_id):
         return self.userDAO.get_contacts(user_id)

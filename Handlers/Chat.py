@@ -68,30 +68,6 @@ class ChatHandler:
         }
         return chat
 
-    def like_chat_message(self, chat_id, message_id):
-        message = {
-            'message_id': 5,
-            'message': 'message',
-            'cid': 1,
-            'contact_id': 1,
-            'likes': [],
-            'dislikes': [],
-            'img': '/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png'
-        }
-        return message
-
-    def dislike_chat_message(self, chat_id, message_id):
-        message = {
-            'message_id': 5,
-            'message': 'message',
-            'cid': 1,
-            'contact_id': 1,
-            'likes': [],
-            'dislikes': [],
-            'img': '/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png'
-        }
-        return message
-
     def reply_chat_message(self, chat_id, message_id, message):
         replies = [
             {
