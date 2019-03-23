@@ -30,7 +30,7 @@ CREATE TABLE Messages (
     created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE Multimedia (
+CREATE TABLE Photo (
     image BYTEA NOT NULL,
     mid INTEGER REFERENCES Messages(mid) UNIQUE
 );
