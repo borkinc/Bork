@@ -12,8 +12,7 @@ CREATE TABLE Users (
 CREATE TABLE Chat_Group (
     cid serial PRIMARY KEY,
     uid INTEGER REFERENCES Users(uid),
-    name varchar(25) NOT NULL,
-    PRIMARY KEY(cid, uid)
+    name varchar(25) NOT NULL
 );
 
 CREATE TABLE Chat_Members (
