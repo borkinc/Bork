@@ -7,6 +7,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 from flask_restful import Resource, reqparse
 
 from Handlers.Chat import ChatHandler
+from Handlers.Message import MessageHandler
 from Handlers.Users import UserHandler
 
 HELP_TEXT = 'This field cannot be blank'
@@ -114,6 +115,15 @@ class Users(Resource):
             return jsonify(msg='Bad request')
 
 
+class User(Resource):
+    def __init__(self):
+        self.handler = UserHandler()
+
+    def get(self, uid):
+        user = self.handler.get_user_by_id(uid)
+        return jsonify(user=user)
+
+
 class Chats(Resource):
 
     @jwt_required
@@ -148,7 +158,6 @@ class Chats(Resource):
         data = parser.parse_args()
         chat = ChatHandler().remove_chat(cid=1)
         return jsonify(chat=chat, msg='Successfully removed chat')
-
 
 
 class Contacts(Resource):
@@ -202,6 +211,16 @@ class Contacts(Resource):
         return jsonify(contact=contact)
 
 
+class Contact(Resource):
+
+    def __init__(self):
+        self.handler = UserHandler()
+
+    def get(self, uid):
+        contacts = self.handler.get_contacts(uid)
+        return jsonify(contacts=contacts)
+
+
 class Chat(Resource):
 
     def __init__(self):
@@ -244,26 +263,67 @@ class ChatMessages(Resource):
         return jsonify(message=message)
 
 
+class Messages(Resource):
+
+    def __init__(self):
+        self.handler = MessageHandler()
+
+    def get(self):
+        messages = self.handler.get_all_messages()
+        return jsonify(messages=messages)
+
+
+class Message(Resource):
+
+    def __init__(self):
+        self.handler = MessageHandler()
+
+    def get(self, mid):
+        message = self.handler.get_message(mid)
+        return jsonify(message=message)
+
+
 class LikeChatMessage(Resource):
 
+    def __init__(self):
+        self.handler = MessageHandler()
+
+    def get(self, mid):
+        likers = self.handler.get_likers(mid)
+        return jsonify(likers=likers)
+
     @jwt_required
-    def post(self, chat_id, message_id):
-        message = ChatHandler().like_chat_message(chat_id=1, message_id=1)
+    def post(self, mid):
+        message = self.handler.like_message(mid)
         return jsonify(message=message)
 
 
 class DislikeChatMessage(Resource):
 
+    def __init__(self):
+        self.handler = MessageHandler()
+
+    def get(self, mid):
+        dislikers = MessageHandler().get_dislikers(mid)
+        return jsonify(dislikers=dislikers)
+
     @jwt_required
-    def post(self, chat_id, message_id):
-        message = ChatHandler().dislike_chat_message(chat_id=1, message_id=1)
+    def post(self, mid):
+        message = self.handler.dislike_message(mid)
         return jsonify(message=message)
 
 
 class ReplyChatMessage(Resource):
 
+    def __init__(self):
+        self.handler = MessageHandler()
+
+    def get(self, mid):
+        replies = self.handler.get_replies(mid)
+        return jsonify(replies=replies)
+
     @jwt_required
-    def post(self, chat_id, message_id):
+    def post(self, mid):
         parser = reqparse.RequestParser()
         parser.add_argument('message', help=HELP_TEXT, required=True)
         parser.add_argument('img')
