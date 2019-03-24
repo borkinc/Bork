@@ -12,14 +12,16 @@ CREATE TABLE Users (
 CREATE TABLE Chat_Group (
     cid serial PRIMARY KEY,
     uid INTEGER REFERENCES Users(uid),
-    name varchar(20) NOT NULL
+    name varchar(20) NOT NULL,
+    PRIMARY KEY(cid, uid)
+
 );
 
 CREATE TABLE Chat_Members (
     cid INTEGER REFERENCES Chat_Group(cid),
     uid INTEGER REFERENCES Users(uid),
     joined_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(cid, uid)
+    PRIMARY KEY (cid, uid)
 );
 
 CREATE TABLE Messages (
@@ -30,14 +32,15 @@ CREATE TABLE Messages (
     created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE Multimedia (
+CREATE TABLE Photo (
     image BYTEA NOT NULL,
-    mid INTEGER REFERENCES Messages(mid) UNIQUE
+    mid INTEGER REFERENCES Messages(mid) PRIMARY KEY
 );
 
 CREATE TABLE Replies (
     replied_to INTEGER REFERENCES Messages(mid),
-    reply INTEGER REFERENCES Messages(mid)
+    reply INTEGER REFERENCES Messages(mid),
+    PRIMARY KEY(replied_to, reply)
 );
 
 
@@ -46,13 +49,13 @@ CREATE TABLE Likes(
     mid INTEGER REFERENCES Messages(mid),
     uid INTEGER REFERENCES Users(uid),
     upvote BOOLEAN NOT NULL,
-    UNIQUE(mid, uid)
+    PRIMARY KEY(mid, uid)
 );
 
 CREATE TABLE Contacts(
     owner_id Integer REFERENCES  Users(uid),
     contact_id Integer REFERENCES Users(uid),
-    UNIQUE(owner_id, contact_id)
+    PRIMARY KEY(owner_id, contact_id)
 );
 
 CREATE TABLE Hashtags(
@@ -63,5 +66,5 @@ CREATE TABLE Hashtags(
 CREATE TABLE Hashtags_Messages(
     hid INTEGER REFERENCES Hashtags(hid),
     mid INTEGER REFERENCES Messages(mid),
-    UNIQUE(hid, mid)
+    PRIMARY KEY(hid, mid)
 )
