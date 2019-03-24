@@ -23,7 +23,7 @@ class ChatDAO(DAO):
                 "like_count on messages.mid = like_count.mid left outer join multimedia on " \
                 "messages.mid = multimedia.mid left outer join dislike_count on messages.mid = dislike_count.mid " \
                 "left outer join users on messages.uid = users.uid where messages.cid = %s"
-        cursor.execute(query, (cid, ))
+        cursor.execute(query, (cid,))
         messages = [row for row in cursor]
         return messages
 
@@ -37,35 +37,35 @@ class ChatDAO(DAO):
     def get_chat(self, cid):
         cursor = self.get_cursor()
         query = "select * from chat_group where cid = %s"
-        cursor.execute(query, (cid, ))
+        cursor.execute(query, (cid,))
         chat = [row for row in cursor]
         return chat[0]
 
     def get_members_from_chat(self, cid):
         cursor = self.get_cursor()
         query = "select * from chat_members natural inner join users where cid = %s"
-        cursor.execute(query, (cid, ))
+        cursor.execute(query, (cid,))
         members = [row for row in cursor]
         return members
 
     def get_owner_of_chat(self, cid):
         cursor = self.get_cursor()
         query = "select * from chat_group natural inner join users where cid = %s"
-        cursor.execute(query, (cid, ))
+        cursor.execute(query, (cid,))
         chat = [row for row in cursor]
         return chat[0]['username']
 
     def get_likes_message(self, mid):
         cursor = self.get_cursor()
         query = "select count(*) from Likes where mid = %s and upvote = true"
-        cursor.execute(query, (mid, ))
+        cursor.execute(query, (mid,))
         return cursor[0]
 
     def get_list_of_likers_message(self, mid):
         cursor = self.get_cursor()
         query = "select username from Likes left outer join users on likes.uid = users.uid where likes.mid = %s and " \
                 "upvote = true "
-        cursor.execute(query, (mid, ))
+        cursor.execute(query, (mid,))
         usernames = [row for row in cursor]
         return usernames
 
@@ -73,7 +73,7 @@ class ChatDAO(DAO):
         cursor = self.get_cursor()
         query = "select username from Likes left outer join users on likes.uid = users.uid where likes.mid = %s and " \
                 "upvote = false "
-        cursor.execute(query, (mid, ))
+        cursor.execute(query, (mid,))
         usernames = [row for row in cursor]
         return usernames
 
