@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -9,7 +11,8 @@ from resources import UserRegistration, TokenRefresh, UserLogin, Chats, Index, C
     LikeChatMessage, DislikeChatMessage, ReplyChatMessage, User, Contact, Messages, Message
 
 app = Flask(__name__)
-app.config.from_object('config.config.BaseConfig')
+config = f'config.config.{os.getenv("FLASK_SETTINGS")}'
+app.config.from_object(config)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 api = Api(app, prefix='/api')
 jwt = JWTManager(app)
