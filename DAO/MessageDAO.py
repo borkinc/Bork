@@ -28,19 +28,19 @@ class MessageDAO(DAO):
         return message[0]
 
     def get_message_replies(self, mid):
-       pass
+        pass
 
     def get_likes_message(self, mid):
         cursor = self.get_cursor()
         query = "select count(*) from Likes where mid = %s and upvote = true"
-        cursor.execute(query, (mid, ))
+        cursor.execute(query, (mid,))
         return cursor[0]
 
     def get_list_of_likers_message(self, mid):
         cursor = self.get_cursor()
         query = "select username from Likes left outer join users on likes.uid = users.uid where likes.mid = %s and " \
                 "upvote = true "
-        cursor.execute(query, (mid, ))
+        cursor.execute(query, (mid,))
         usernames = [row for row in cursor]
         return usernames
 
@@ -48,7 +48,7 @@ class MessageDAO(DAO):
         cursor = self.get_cursor()
         query = "select username from Likes left outer join users on likes.uid = users.uid where likes.mid = %s and " \
                 "upvote = false "
-        cursor.execute(query, (mid, ))
+        cursor.execute(query, (mid,))
         usernames = [row for row in cursor]
         return usernames
 
