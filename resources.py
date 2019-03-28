@@ -41,7 +41,7 @@ class UserRegistration(Resource):
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         uid = UserHandler().insert_user(username=username, email=email, password=hashed_password)
         access_token = create_access_token(identity=username)
-        refresh_token = create_refresh_token(identity=username)
+        refresh_token = create_refresh_token(identity=username, expires_delta=datetime.timedelta(days=365))
         user = {
             'uid': uid,
             'username': username,
