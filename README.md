@@ -38,21 +38,21 @@ To run app with Development/Production settings, set the environment variable.
 * Development
   * MacOs/Ubuntu
     ``` Shell
-    export FLASK_SETTINGS="DevelopmentConfig"
+    export FLASK_SETTINGS=DevelopmentConfig
     ```
    * Windows
     ```Shell
-    set FLASK_SETTINGS="DevelopmentConfig"
+    set FLASK_SETTINGS=DevelopmentConfig
     ```
 * Production
   * MacOs/Ubuntu
     ``` Shell
-    export FLASK_SETTINGS="ProductionConfig"
+    export FLASK_SETTINGS=ProductionConfig
     export DATABASE_URL="DATABASE URL HERE"
     ```
    * Windows
     ```Shell
-    set FLASK_SETTINGS="ProductionConfig"
+    set FLASK_SETTINGS=ProductionConfig
     set DATABASE_URL="DATABASE URL HERE"
     ```
 

@@ -64,19 +64,15 @@ class UserLogin(Resource):
 
         # Verifies needed parameters to register users are present
         data = parser.parse_args()
-
-        # Dummy data for Phase I
-        username = 'ninja'
-        password = 'password'
-        user, is_authenticated = UserHandler().verify_password(username, password)
+        user, is_authenticated = UserHandler().verify_password(data['username'], data['password'])
         if is_authenticated:
 
             # TODO: Remove expires_delta after Phase I
-            access_token = create_access_token(identity=username, expires_delta=datetime.timedelta(days=365))
-            refresh_token = create_refresh_token(identity=username)
+            access_token = create_access_token(identity=data['username'], expires_delta=datetime.timedelta(days=365))
+            refresh_token = create_refresh_token(identity=data['username'])
             user = {
-                'uid': user['uid'],
-                'username': username,
+                'uid': user[0]['uid'],
+                'username': data['username'],
                 'access_token': access_token,
                 'refresh_token': refresh_token
             }
