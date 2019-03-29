@@ -2,8 +2,7 @@ import datetime
 
 import bcrypt
 from flask import jsonify
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_refresh_token_required, get_jwt_identity, \
-    jwt_required
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity
 from flask_restful import Resource, reqparse
 
 from Handlers.Chat import ChatHandler
@@ -88,7 +87,7 @@ class Users(Resource):
     def __init__(self):
         self.handler = UserHandler()
 
-    @jwt_required
+    # @jwt_required
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('username')
@@ -99,7 +98,7 @@ class Users(Resource):
             users = self.handler.get_users()
         return jsonify(users=users)
 
-    @jwt_required
+    # @jwt_required
     def put(self):
         parser = reqparse.RequestParser()
         parser.add_argument('new_username')
@@ -122,7 +121,7 @@ class User(Resource):
 
 class Chats(Resource):
 
-    @jwt_required
+    # @jwt_required
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('cid')
@@ -133,7 +132,7 @@ class Chats(Resource):
             chats = ChatHandler().get_chats()
         return jsonify(chats=chats)
 
-    @jwt_required
+    # @jwt_required
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('chat_name', help=HELP_TEXT, required=True)
@@ -147,7 +146,7 @@ class Chats(Resource):
             msg = 'Bad request'
         return jsonify(chat=chat, msg=msg)
 
-    @jwt_required
+    # @jwt_required
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('cid')
@@ -161,7 +160,7 @@ class Contacts(Resource):
     def __init__(self):
         self.handler = UserHandler()
 
-    @jwt_required
+    # @jwt_required
     def get(self):
         """
         Retrieves all contacts from database
@@ -173,7 +172,7 @@ class Contacts(Resource):
         contacts = self.handler.get_contacts(1)
         return jsonify(contacts=contacts)
 
-    @jwt_required
+    # @jwt_required
     def post(self):
 
         parser = reqparse.RequestParser()
@@ -190,7 +189,7 @@ class Contacts(Resource):
             return jsonify(msg='Bad request')
         return jsonify(contact=contact)
 
-    @jwt_required
+    # @jwt_required
     def put(self):
         parser = reqparse.RequestParser()
         parser.add_argument('contact_id', help=HELP_TEXT, required=True)
@@ -198,7 +197,7 @@ class Contacts(Resource):
         contact = self.handler.update_contact(1)
         return jsonify(contact=contact)
 
-    @jwt_required
+    # @jwt_required
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('contact_id', help=HELP_TEXT, required=True)
@@ -223,13 +222,17 @@ class Chat(Resource):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('contact_id', help=HELP_TEXT, required=True)
 
-    @jwt_required
+    def get(self, cid):
+        chat = ChatHandler().get_chat(cid)
+        return jsonify(chat=chat)
+
+    # @jwt_required
     def post(self, cid):
         data = self.parser.parse_args()
         chat = ChatHandler().add_contact_to_chat_group(1)
         return jsonify(chat=chat)
 
-    @jwt_required
+    # @jwt_required
     def delete(self, cid):
         data = self.parser.parse_args()
         chat = ChatHandler().remove_contact_from_chat_group(1)
@@ -238,7 +241,7 @@ class Chat(Resource):
 
 class ChatMessages(Resource):
 
-    @jwt_required
+    # @jwt_required
     def get(self, chat_id):
         """
         Gets all messages from given chat id.
@@ -248,7 +251,7 @@ class ChatMessages(Resource):
         messages = ChatHandler().get_chat_messages(chat_id)
         return jsonify(messages=messages)
 
-    @jwt_required
+    # @jwt_required
     def post(self, chat_id):
         parser = reqparse.RequestParser()
         parser.add_argument('message', help=HELP_TEXT, required=True)
@@ -288,7 +291,7 @@ class LikeChatMessage(Resource):
         likers = self.handler.get_likers(mid)
         return jsonify(likers=likers)
 
-    @jwt_required
+    # @jwt_required
     def post(self, mid):
         message = self.handler.like_message(mid)
         return jsonify(message=message)
@@ -303,7 +306,7 @@ class DislikeChatMessage(Resource):
         dislikers = MessageHandler().get_dislikers(mid)
         return jsonify(dislikers=dislikers)
 
-    @jwt_required
+    # @jwt_required
     def post(self, mid):
         message = self.handler.dislike_message(mid)
         return jsonify(message=message)
@@ -318,7 +321,7 @@ class ReplyChatMessage(Resource):
         replies = self.handler.get_replies(mid)
         return jsonify(replies=replies)
 
-    @jwt_required
+    # @jwt_required
     def post(self, mid):
         parser = reqparse.RequestParser()
         parser.add_argument('message', help=HELP_TEXT, required=True)
@@ -330,7 +333,7 @@ class ReplyChatMessage(Resource):
 
 class TokenRefresh(Resource):
 
-    @jwt_refresh_token_required
+    # @jwt_refresh_token_required
     def post(self):
         current_user = get_jwt_identity()
         access_token = create_access_token(identity=current_user)

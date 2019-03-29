@@ -38,19 +38,19 @@ class MessageDAO(DAO):
 
     def get_list_of_likers_message(self, mid):
         cursor = self.get_cursor()
-        query = "select username from Likes left outer join users on likes.uid = users.uid where likes.mid = %s and " \
-                "upvote = true "
+        query = "SELECT users.uid, users.username " \
+                "FROM users INNER JOIN messages ON messages.mid = %s AND messages.uid = users.uid " \
+                "INNER JOIN likes ON messages.mid = likes.mid AND likes.upvote = TRUE "
         cursor.execute(query, (mid,))
-        usernames = [row for row in cursor]
-        return usernames
+        return cursor.fetchall()
 
     def get_list_of_dislikers_message(self, mid):
         cursor = self.get_cursor()
-        query = "select username from Likes left outer join users on likes.uid = users.uid where likes.mid = %s and " \
-                "upvote = false "
+        query = "SELECT users.uid, users.username " \
+                "FROM users INNER JOIN messages ON messages.mid = %s AND messages.uid = users.uid " \
+                "INNER JOIN likes ON messages.mid = likes.mid AND likes.upvote = FALSE "
         cursor.execute(query, (mid,))
-        usernames = [row for row in cursor]
-        return usernames
+        return cursor.fetchall()
 
     def like_message(self, mid):
         pass
