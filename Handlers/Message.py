@@ -32,7 +32,7 @@ class MessageHandler:
     def dislike_message(self, mid):
         return self.dao.dislike_message(mid)
 
-    def get_num_messages_daily(self, request):
+    def get_num_messages_daily(self):
         today = datetime.datetime.today()
         num_posts = []
         for i in range(7):
@@ -41,7 +41,7 @@ class MessageHandler:
             num_posts.append({'%s' % day_to_get: num})
         return jsonify(result=num_posts)
 
-    def get_num_likes_daily(self, request):
+    def get_num_likes_daily(self):
         today = datetime.datetime.today()
         num_likes = []
         for i in range(7):
@@ -50,8 +50,7 @@ class MessageHandler:
             num_likes.append({'%s' % day_to_get: num})
         return jsonify(result=num_likes)
 
-
-    def get_num_dislikes_daily(self, request):
+    def get_num_dislikes_daily(self):
         today = datetime.datetime.today()
         num_dislikes = []
         for i in range(7):
@@ -60,7 +59,7 @@ class MessageHandler:
             num_dislikes.append({'%s' % day_to_get: num})
         return jsonify(result=num_dislikes)
 
-    def get_num_replies_daily(self, request):
+    def get_num_replies_daily(self):
         today = datetime.datetime.today()
         num_replies = []
         for i in range(7):
@@ -69,29 +68,29 @@ class MessageHandler:
             num_replies.append({'%s' % day_to_get: num})
         return jsonify(result=num_replies)
 
-    def get_num_replies_photo(self, request):
+    def get_num_replies_photo(self, pid):
         today = datetime.datetime.today()
         num_replies = []
         for i in range(7):
             day_to_get = today - relativedelta(days=i)
-            num = self.dao.get_num_replies_photos_daily(day_to_get)
+            num = self.dao.get_num_replies_photos_daily(pid, day_to_get)
             num_replies.append({'%s' % day_to_get: num})
         return jsonify(result=num_replies)
 
-    def get_num_likes_photo(self, request):
+    def get_num_likes_photo(self, pid):
         today = datetime.datetime.today()
         num_likes = []
         for i in range(7):
             day_to_get = today - relativedelta(days=i)
-            num = self.dao.get_num_like_photos_daily(day_to_get, True)
+            num = self.dao.get_num_like_photos_daily(pid, day_to_get, True)
             num_likes.append({'%s' % day_to_get: num})
         return jsonify(result=num_likes)
 
-    def get_num_dislikes_photo(self, request):
+    def get_num_dislikes_photo(self, pid):
         today = datetime.datetime.today()
         num_likes = []
         for i in range(7):
             day_to_get = today - relativedelta(days=i)
-            num = self.dao.get_num_like_photos_daily(day_to_get, False)
+            num = self.dao.get_num_like_photos_daily(pid, day_to_get, False)
             num_likes.append({'%s' % day_to_get: num})
         return jsonify(result=num_likes)
