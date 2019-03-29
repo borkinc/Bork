@@ -6,6 +6,7 @@ from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
 from Handlers.Chat import ChatHandler
+from Handlers.Message import MessageHandler
 from Handlers.Users import UserHandler
 from resources import UserRegistration, TokenRefresh, UserLogin, Chats, Index, ChatMessages, Contacts, Users, Chat, \
     LikeChatMessage, DislikeChatMessage, ReplyChatMessage, User, Contact, Messages, Message
@@ -25,9 +26,9 @@ def trending_topics():
     return ChatHandler().get_trending_hashtags(request), 200
 
 
-@app.route('/stats/posts')
+@app.route('/stats/messages')
 def num_of_posts():
-    return ChatHandler().get_num_posts_daily(request), 200
+    return MessageHandler().get_num_messages_daily(request), 200
 
 
 @app.route('/stats/likes')

@@ -89,24 +89,3 @@ class ChatHandler:
     def get_trending_hashtags(self, request):
         hashtags = [{'hid': 3, 'tag': '#bork'}, {'hid': 4, 'tag': '#borked'}]
         return jsonify(result=hashtags)
-
-    def get_num_posts_daily(self, request):
-        return jsonify(result=4)
-
-    def get_num_likes_daily(self, request):
-        return jsonify(result=3)
-
-    def get_num_replies_daily(self, request):
-        return jsonify(result=1)
-
-    def get_num_dislikes_daily(self, request):
-        return jsonify(result=0)
-
-    def get_num_replies_photo(self, request):
-        return jsonify(result=1)
-
-    def get_num_likes_photo(self, request):
-        return jsonify(result=1)
-
-    def get_num_dislikes_photo(self, request):
-        return jsonify(result=100)
