@@ -16,23 +16,20 @@ class UserDAO(DAO):
         cursor = self.get_cursor()
         query = 'select username, first_name, last_name, email, phone_number from users;'
         cursor.execute(query)
-        users = [row for row in cursor]
-        return users
+        return cursor.fetchall()
 
     def get_user(self, uid):
         cursor = self.get_cursor()
         query = 'select username, first_name, last_name, email, phone_number from users where uid = %s'
         cursor.execute(query, (uid,))
-        user = [row for row in cursor]
-        return user[0]
+        return cursor.fetchall()
 
     def get_contacts(self, uid):
         cursor = self.get_cursor()
         query = 'select username, first_name, last_name from contacts, users inner join on contact_id = uid ' \
                 'where owner_id = %s'
         cursor.execute(query, (uid,))
-        users = [row for row in cursor]
-        return users
+        return cursor.fetchall()
 
     def get_user_by_username(self, username):
         cursor = self.get_cursor()

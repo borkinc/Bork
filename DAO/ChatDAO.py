@@ -32,8 +32,7 @@ class ChatDAO(DAO):
         cursor = self.get_cursor()
         query = "select * from chat_group"
         cursor.execute(query)
-        chat_groups = [row for row in cursor]
-        return chat_groups
+        return cursor.fetchall()
 
     def get_chat(self, cid):
         cursor = self.get_cursor()
@@ -42,22 +41,18 @@ class ChatDAO(DAO):
                 "ORDER BY messages.created_on DESC LIMIT 1"
         cursor.execute(query, (cid,))
         return cursor.fetchall()
-        # chat = [row for row in cursor]
-        # return chat[0]
 
     def get_members_from_chat(self, cid):
         cursor = self.get_cursor()
         query = "select * from chat_members natural inner join users where cid = %s"
         cursor.execute(query, (cid,))
-        members = [row for row in cursor]
-        return members
+        return cursor.fetchall()
 
     def get_owner_of_chat(self, cid):
         cursor = self.get_cursor()
         query = "select * from chat_group natural inner join users where cid = %s"
         cursor.execute(query, (cid,))
-        chat = [row for row in cursor]
-        return chat[0]['username']
+        return cursor.fetchall()
 
     def insert_chat_group(self, chat_name, owner_id):
         cursor = self.get_cursor()
