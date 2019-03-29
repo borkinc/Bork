@@ -12,8 +12,7 @@ class MessageDAO(DAO):
                 "messages.mid = multimedia.mid left outer join dislike_count on messages.mid = dislike_count.mid " \
                 "left outer join users on messages.uid = users.uid"
         cursor.execute(query)
-        messages = [row for row in cursor]
-        return messages
+        return cursor.fetchall()
 
     def get_message(self, mid):
         cursor = self.get_cursor()
@@ -24,8 +23,7 @@ class MessageDAO(DAO):
                 "messages.mid = multimedia.mid left outer join dislike_count on messages.mid = dislike_count.mid " \
                 "left outer join users on messages.uid = users.uid where messages.mid = %s"
         cursor.execute(query, (mid,))
-        message = [row for row in cursor]
-        return message[0]
+        return cursor.fetchall()
 
     def get_message_replies(self, mid):
         pass
@@ -34,23 +32,23 @@ class MessageDAO(DAO):
         cursor = self.get_cursor()
         query = "select count(*) from Likes where mid = %s and upvote = true"
         cursor.execute(query, (mid,))
-        return cursor[0]
+        return cursor.fetchall()
 
     def get_list_of_likers_message(self, mid):
         cursor = self.get_cursor()
-        query = "select username from Likes left outer join users on likes.uid = users.uid where likes.mid = %s and " \
-                "upvote = true "
+        query = "SELECT users.uid, users.username " \
+                "FROM users INNER JOIN messages ON messages.mid = %s AND messages.uid = users.uid " \
+                "INNER JOIN likes ON messages.mid = likes.mid AND likes.upvote = TRUE "
         cursor.execute(query, (mid,))
-        usernames = [row for row in cursor]
-        return usernames
+        return cursor.fetchall()
 
     def get_list_of_dislikers_message(self, mid):
         cursor = self.get_cursor()
-        query = "select username from Likes left outer join users on likes.uid = users.uid where likes.mid = %s and " \
-                "upvote = false "
+        query = "SELECT users.uid, users.username " \
+                "FROM users INNER JOIN messages ON messages.mid = %s AND messages.uid = users.uid " \
+                "INNER JOIN likes ON messages.mid = likes.mid AND likes.upvote = FALSE "
         cursor.execute(query, (mid,))
-        usernames = [row for row in cursor]
-        return usernames
+        return cursor.fetchall()
 
     def like_message(self, mid):
         pass

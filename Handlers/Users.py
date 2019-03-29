@@ -7,7 +7,7 @@ from DAO.UserDAO import UserDAO
 class UserHandler:
 
     def __init__(self):
-        self.password = bcrypt.hashpw('password'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        self.password = 'password'
         self.first_name = 'first_name'
         self.last_name = 'last_name'
         self.email = 'email'
@@ -95,8 +95,8 @@ class UserHandler:
         return {'username': username, 'uid': 1, 'password': password}
 
     def verify_password(self, username, password):
-        user = self.get_user(username)
-        is_authenticated = bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8'))
+        user = self.userDAO.get_user_by_username(username)
+        is_authenticated = bcrypt.checkpw(self.password.encode('utf-8'), user[0]['password'].encode('utf-8'))
         return user, is_authenticated
 
     def update_user_username(self, username, new_username):

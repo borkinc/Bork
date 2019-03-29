@@ -1,99 +1,33 @@
-CREATE TABLE Users (
-    uid SERIAL PRIMARY KEY,
-    username varchar(30) UNIQUE NOT NULL,
-    password varchar(100) NOT NULL,
-    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    email varchar(100) UNIQUE NOT NULL,
-    first_name varchar(30) NOT NULL,
-    last_name varchar(30) NOT NULL,
-    phone_number varchar(10) NOT NULL
-);
-
-CREATE TABLE Chat_Group (
-    cid serial PRIMARY KEY,
-    uid INTEGER REFERENCES Users(uid),
-    name varchar(25) NOT NULL
-);
-
-CREATE TABLE Chat_Members (
-    cid INTEGER REFERENCES Chat_Group(cid),
-    uid INTEGER REFERENCES Users(uid),
-    joined_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (cid, uid)
-);
-
-CREATE TABLE Messages (
-    mid serial PRIMARY KEY,
-    cid INTEGER REFERENCES Chat_Group(cid),
-    uid INTEGER REFERENCES Users(uid),
-    message VARCHAR(500),
-    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE Photo (
-    image BYTEA NOT NULL,
-    mid INTEGER REFERENCES Messages(mid) Primary Key
-);
-
-CREATE TABLE Replies (
-    replied_to INTEGER REFERENCES Messages(mid),
-    reply INTEGER REFERENCES Messages(mid),
-    PRIMARY KEY(replied_to, reply)
-);
-
-CREATE TABLE Likes(
-    mid INTEGER REFERENCES Messages(mid),
-    uid INTEGER REFERENCES Users(uid),
-    upvote BOOLEAN NOT NULL,
-    PRIMARY KEY(mid, uid)
-);
-
-CREATE TABLE Contacts(
-    owner_id Integer REFERENCES  Users(uid),
-    contact_id Integer REFERENCES Users(uid),
-    PRIMARY KEY(owner_id, contact_id)
-);
-
-CREATE TABLE Hashtags(
-    hid SERIAL PRIMARY KEY,
-    hashtag varchar(50) UNIQUE NOT NULL
-);
-
-CREATE TABLE Hashtags_Messages(
-    hid INTEGER REFERENCES Hashtags(hid),
-    mid INTEGER REFERENCES Messages(mid),
-    PRIMARY KEY(hid, mid)
-);
-
 -- Inserting 10 - 15 rows to each database table for testing purposes
 -- Table: Users
 -- Rows: 13
 INSERT INTO Users(username, password, email, first_name, last_name, phone_number)
-VALUES ('quaoarcone', 'freshbeam71', 'plover@sbcglobal.net', 'Madina', 'Bowman', '7253068397');
+VALUES ('quaoarcone', '$2b$12$AKYmB6amQIoZK3vUnN33Le7mEZIrqotkaG6XKl0/b5FgoHOxop.hW', 'plover@sbcglobal.net', 'Madina', 'Bowman', '7253068397');
 INSERT INTO Users(username, password, email, first_name, last_name, phone_number)
-VALUES ('argumentvowel', 'calmstart66', 'bahwi@optonline.net', 'Can', 'Wheeler', '3427340128');
+VALUES ('argumentvowel', '$2b$12$AKYmB6amQIoZK3vUnN33Le7mEZIrqotkaG6XKl0/b5FgoHOxop.hW', 'bahwi@optonline.net', 'Can', 'Wheeler', '3427340128');
 INSERT INTO Users(username, password, email, first_name, last_name, phone_number)
-VALUES ('gnatwipe', 'swiftlift93', 'quinn@icloud.com', 'Frankie', 'Bolton', '5063801658');
+VALUES ('gnatwipe', '$2b$12$AKYmB6amQIoZK3vUnN33Le7mEZIrqotkaG6XKl0/b5FgoHOxop.hW', 'quinn@icloud.com', 'Frankie', 'Bolton', '5063801658');
 INSERT INTO Users(username, password, email, first_name, last_name, phone_number)
-VALUES ('subwaypunish', 'roundwood48', 'danneng@aol.com', 'Nabiha', 'Salas', '3945802107');
+VALUES ('subwaypunish', '$2b$12$AKYmB6amQIoZK3vUnN33Le7mEZIrqotkaG6XKl0/b5FgoHOxop.hW', 'danneng@aol.com', 'Nabiha', 'Salas', '3945802107');
 INSERT INTO Users(username, password, email, first_name, last_name, phone_number)
-VALUES ('ledwychenewman', 'supercoal74', 'matloff@aol.com', 'Zohaib', 'Swan', '4787892333');
+VALUES ('ledwychenewman', '$2b$12$AKYmB6amQIoZK3vUnN33Le7mEZIrqotkaG6XKl0/b5FgoHOxop.hW', 'matloff@aol.com', 'Zohaib', 'Swan', '4787892333');
 INSERT INTO Users(username, password, email, first_name, last_name, phone_number)
-VALUES ('wombdivisive', 'swiftline72', 'library@att.net', 'Aaran', 'Sheridan', '2142503399');
+VALUES ('wombdivisive', '$2b$12$AKYmB6amQIoZK3vUnN33Le7mEZIrqotkaG6XKl0/b5FgoHOxop.hW', 'library@att.net', 'Aaran', 'Sheridan', '2142503399');
 INSERT INTO Users(username, password, email, first_name, last_name, phone_number)
-VALUES ('nutsnear', 'smalldingo96', 'rfoley@comcast.net', 'Shelbie', 'Walters', '7664462811');
+VALUES ('nutsnear', '$2b$12$AKYmB6amQIoZK3vUnN33Le7mEZIrqotkaG6XKl0/b5FgoHOxop.hW', 'rfoley@comcast.net', 'Shelbie', 'Walters', '7664462811');
 INSERT INTO Users(username, password, email, first_name, last_name, phone_number)
-VALUES ('charmsooner', 'sillygoat35', 'tfinniga@msn.com', 'Coral', 'Wheatley', '5176299057');
+VALUES ('charmsooner', '$2b$12$AKYmB6amQIoZK3vUnN33Le7mEZIrqotkaG6XKl0/b5FgoHOxop.hW', 'tfinniga@msn.com', 'Coral', 'Wheatley', '5176299057');
 INSERT INTO Users(username, password, email, first_name, last_name, phone_number)
-VALUES ('perkybrockville', 'noisywarthog62', 'magusnet@me.com', 'Khloe', 'Fountain', '5795751967');
+VALUES ('perkybrockville', '$2b$12$AKYmB6amQIoZK3vUnN33Le7mEZIrqotkaG6XKl0/b5FgoHOxop.hW', 'magusnet@me.com', 'Khloe', 'Fountain', '5795751967');
 INSERT INTO Users(username, password, email, first_name, last_name, phone_number)
-VALUES ('gwendraethsteed', 'poorclub12', 'andersbr@live.com', 'Danny', 'Lees', '7704463843');
+VALUES ('gwendraethsteed', '$2b$12$AKYmB6amQIoZK3vUnN33Le7mEZIrqotkaG6XKl0/b5FgoHOxop.hW', 'andersbr@live.com', 'Danny', 'Lees', '7704463843');
 INSERT INTO Users(username, password, email, first_name, last_name, phone_number)
-VALUES ('gotbudweiser', 'megacorn86', 'bwcarty@sbcglobal.net', 'Roger', 'Armitage', '6584463537');
+VALUES ('gotbudweiser', '$2b$12$AKYmB6amQIoZK3vUnN33Le7mEZIrqotkaG6XKl0/b5FgoHOxop.hW', 'bwcarty@sbcglobal.net',
+'Roger', 'Armitage', '6584463537');
 INSERT INTO Users(username, password, email, first_name, last_name, phone_number)
-VALUES ('lubsash', 'jollyfood48', 'kudra@yahoo.ca', 'Kobi', 'Molina', '9162049680');
+VALUES ('lubsash', '$2b$12$AKYmB6amQIoZK3vUnN33Le7mEZIrqotkaG6XKl0/b5FgoHOxop.hW', 'kudra@yahoo.ca', 'Kobi', 'Molina', '9162049680');
 INSERT INTO Users(username, password, email, first_name, last_name, phone_number)
-VALUES ('pacifiedunfriendly', 'heavyyak18', 'kidehen@live.com', 'Ricardo', 'Mcdonald', '3833863359');
+VALUES ('pacifiedunfriendly', '$2b$12$AKYmB6amQIoZK3vUnN33Le7mEZIrqotkaG6XKl0/b5FgoHOxop.hW', 'kidehen@live.com', 'Ricardo', 'Mcdonald', '3833863359');
 
 -- Table: Chat_Group
 -- Rows: 14
@@ -235,4 +169,3 @@ INSERT INTO Hashtags_messages VALUES (5, 4);
 INSERT INTO Hashtags_messages VALUES (9, 12);
 INSERT INTO Hashtags_messages VALUES (12, 2);
 INSERT INTO Hashtags_messages VALUES (7, 2);
-
