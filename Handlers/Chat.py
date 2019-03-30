@@ -1,5 +1,3 @@
-from flask import jsonify
-
 from DAO.ChatDAO import ChatDAO
 
 
@@ -86,6 +84,3 @@ class ChatHandler:
         }
         return message
 
-    def get_trending_hashtags(self, request):
-        hashtags = [{'hid': 3, 'tag': '#bork'}, {'hid': 4, 'tag': '#borked'}]
-        return jsonify(result=hashtags)

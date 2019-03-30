@@ -94,3 +94,12 @@ class MessageHandler:
             num = self.dao.get_num_like_photos_daily(pid, day_to_get, False)
             num_likes.append({'%s' % day_to_get: num})
         return jsonify(result=num_likes)
+
+    def get_trending_hashtags(self):
+        today = datetime.datetime.today()
+        hashtags = []
+        for i in range(7):
+            day_to_get = today - relativedelta(days=i)
+            hashtags = self.dao.get_trending_hashtags_day(day_to_get)
+            hashtags.append({'%s' % day_to_get: hashtags})
+        return jsonify(result=hashtags)
