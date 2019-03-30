@@ -63,7 +63,7 @@ class MessageDAO(DAO):
         end_date = date + relativedelta(days=1)
         query = "select count(*) as num from messages where created_on > %s and created_on < %s"
         cursor.execute(query, (date, end_date))
-        count = [row for row in cursor]
+        count = cursor.fetchall()
         return count[0]['num']
 
     def get_num_likes_daily(self, date, like):
@@ -71,7 +71,7 @@ class MessageDAO(DAO):
         end_date = date + relativedelta(days=1)
         query = "select count(*) as num from likes where liked_on > %s and liked_on < %s and upvote = %s"
         cursor.execute(query, (date, end_date, like))
-        count = [row for row in cursor]
+        count = cursor.fetchall()
         return count[0]['num']
 
     def get_num_replies_daily(self, date):
@@ -80,7 +80,7 @@ class MessageDAO(DAO):
         query = "select count(*) as num from replies inner join messages on messages.mid = replies.reply" \
                 " where created_on > %s and created_on < %s"
         cursor.execute(query, (date, end_date))
-        count = [row for row in cursor]
+        count = cursor.fetchall()
         return count[0]['num']
 
     def get_num_replies_photos_daily(self, pid, date):
@@ -88,7 +88,7 @@ class MessageDAO(DAO):
         end_date = date + relativedelta(days=1)
         query = "select count(*) as num from replies where replies.reply = %s and created _on > %s and created_on < %s"
         cursor.execute(query, (pid, date, end_date, ))
-        count = [row for row in cursor]
+        count = cursor.fetchall()
         return count[0]['num']
 
     def get_num_like_photos_daily(self, pid, date, like):
@@ -97,7 +97,7 @@ class MessageDAO(DAO):
         query = "select count(*) as num likes from likes where likes.mid = %s " \
                 "and likes.upvote = %s and created_on > %s and created_on < %s"
         cursor.execute(query, (pid, like, date, end_date, ))
-        count = [row for row in cursor]
+        count = cursor.fetchall()
         return count[0]['num']
 
 

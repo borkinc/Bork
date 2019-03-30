@@ -44,7 +44,7 @@ class UserDAO(DAO):
         end_date = date + relativedelta(days=1)
         query = "select count(*) as num from messages where messages.uid = %s and created_on > %s and created_on < %s"
         cursor.execute(query, (uid, date, end_date, ))
-        count = [row for row in cursor]
+        count = cursor.fetchall()
         return count[0]['num']
 
     def get_daily_active_users(self, date):
@@ -52,5 +52,5 @@ class UserDAO(DAO):
         end_date = date + relativedelta(days=1)
         query = "select username from messages natural inner join users where created_on > %s and created_on < %s"
         cursor.execute(query, (date, end_date))
-        users = [row for row in cursor]
+        users = cursor.fetchall()
         return users
