@@ -1,4 +1,7 @@
+import datetime
+
 import bcrypt
+from dateutil.relativedelta import relativedelta
 from flask import jsonify
 
 from DAO.UserDAO import UserDAO
@@ -12,7 +15,7 @@ class UserHandler:
         self.last_name = 'last_name'
         self.email = 'email'
         self.phone = '7875555555'
-        self.userDAO = UserDAO()
+        self.dao = UserDAO()
 
     def get_users(self):
         users = [
@@ -59,10 +62,10 @@ class UserHandler:
         return user
 
     def get_user_by_id(self, uid):
-        return self.userDAO.get_user(uid)
+        return self.dao.get_user(uid)
 
     def get_contacts(self, user_id):
-        return self.userDAO.get_contacts(user_id)
+        return self.dao.get_contacts(user_id)
 
     def insert_contact(self, first_name, last_name, email=None, phone=None):
         contact = {
@@ -111,9 +114,21 @@ class UserHandler:
         }
         return contact
 
-    def get_daily_active_users(self, request):
-        users = [{'uid': 2, 'username': 'mark'}, {'uid': 4, 'username': 'Damon'}]
+    def get_daily_active_users(self):
+        today = datetime.datetime.today()
+        users = []
+        for i in range(7):
+            day_to_get = today - relativedelta(days=i)
+            num = self.dao.get_daily_active_users(day_to_get)
+            users.append({'%s' % day_to_get: num})
         return jsonify(result=users)
 
-    def get_num_posts_user(self, request):
-        return jsonify(result=2)
+    def get_num_messages_user(self, uid):
+        today = datetime.datetime.today()
+        num_messages = []
+        for i in range(7):
+            day_to_get = today - relativedelta(days=i)
+            num = self.dao.get_daily_messages_user(uid, day_to_get)
+            num_messages.append({'%s' % day_to_get: num})
+        return jsonify(result=num_messages)
+

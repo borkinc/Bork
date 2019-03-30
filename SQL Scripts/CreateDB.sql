@@ -44,6 +44,7 @@ CREATE TABLE Replies (
 CREATE TABLE Likes(
     mid INTEGER REFERENCES Messages(mid),
     uid INTEGER REFERENCES Users(uid),
+    liked_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     upvote BOOLEAN NOT NULL,
     PRIMARY KEY(mid, uid)
 );

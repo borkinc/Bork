@@ -1,3 +1,5 @@
+from dateutil.relativedelta import relativedelta
+
 from DAO.DAO import DAO
 
 
@@ -36,3 +38,19 @@ class UserDAO(DAO):
         query = 'select uid, username, password from users where username = %s'
         cursor.execute(query, (username,))
         return cursor.fetchall()
+
+    def get_daily_messages_user(self, date, uid):
+        cursor = self.get_cursor()
+        end_date = date + relativedelta(days=1)
+        query = "select count(*) as num from messages where messages.uid = %s and created_on > %s and created_on < %s"
+        cursor.execute(query, (uid, date, end_date, ))
+        count = cursor.fetchall()
+        return count[0]['num']
+
+    def get_daily_active_users(self, date):
+        cursor = self.get_cursor()
+        end_date = date + relativedelta(days=1)
+        query = "select username from messages natural inner join users where created_on > %s and created_on < %s"
+        cursor.execute(query, (date, end_date))
+        users = cursor.fetchall()
+        return users
