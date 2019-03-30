@@ -100,5 +100,13 @@ class MessageDAO(DAO):
         count = cursor.fetchall()
         return count[0]['num']
 
+    def get_trending_hashtags_day(self, date):
+        cursor = self.get_cursor()
+        end_date = date + relativedelta(days=1)
+        query = "select count(*) as num, hid, hashtag from hashtags_messages natural inner join messages " \
+                "natural inner join hashtags where messages.created_on > %s and messages.created_on < %s " \
+                "group by hid order by num desc"
+        cursor.execute(query, (date, end_date))
+        return cursor.fetchall()
 
 
