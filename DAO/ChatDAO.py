@@ -1,32 +1,21 @@
-import base64
-from io import BytesIO
-
-from DAO.DAO import DAO
+from DAO.DAO import DAO, encode_message_images
 
 
 class ChatDAO(DAO):
 
     def get_chat_messages(self, cid):
-        buffered = BytesIO()
         cursor = self.get_cursor()
         query = "with like_count as (select count(*) as likes, mid from likes where upvote = true group by mid), " \
                 "dislike_count as (select count(*) as dislikes, mid from likes where upvote = false group by mid) " \
-                "select messages.mid, message, image, likes, dislikes, username, messages.created_on, messages.uid " \
+                "select messages.mid, message, image, COALESCE(likes, 0) as likes, " \
+                "COALESCE(dislikes, 0) as dislikes, username, messages.created_on, messages.uid " \
                 "from messages left outer join " \
                 "like_count on messages.mid = like_count.mid left outer join photo on " \
                 "messages.mid = photo.mid left outer join dislike_count on messages.mid = dislike_count.mid " \
                 "left outer join users on messages.uid = users.uid where messages.cid = %s"
         cursor.execute(query, (cid,))
-        messages = cursor.fetchall()
-        for message in messages:
-            if message['image']:
-                image_data = message['image'].tobytes()
-                message['image'] = base64.encodebytes(image_data).decode('utf-8')
-            if message['dislikes'] is None:
-                message['dislikes'] = 0
+        messages = encode_message_images(cursor.fetchall())
         return messages
-        # messages = [row for row in cursor]
-        # return messages
 
     def get_all_chats(self):
         cursor = self.get_cursor()
