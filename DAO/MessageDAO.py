@@ -1,3 +1,5 @@
+import base64
+
 from dateutil.relativedelta import relativedelta
 
 from DAO.DAO import DAO
@@ -14,7 +16,14 @@ class MessageDAO(DAO):
                 "messages.mid = photo.mid left outer join dislike_count on messages.mid = dislike_count.mid " \
                 "left outer join users on messages.uid = users.uid"
         cursor.execute(query)
-        return cursor.fetchall()
+        messages = cursor.fetchall()
+        for message in messages:
+            if message['image']:
+                image_data = message['image'].tobytes()
+                message['image'] = base64.encodebytes(image_data).decode('utf-8')
+            if message['dislikes'] is None:
+                message['dislikes'] = 0
+        return messages
 
     def get_message(self, mid):
         cursor = self.get_cursor()
@@ -24,8 +33,14 @@ class MessageDAO(DAO):
                 "like_count on messages.mid = like_count.mid left outer join photo on " \
                 "messages.mid = photo.mid left outer join dislike_count on messages.mid = dislike_count.mid " \
                 "left outer join users on messages.uid = users.uid where messages.mid = %s"
-        cursor.execute(query, (mid,))
-        return cursor.fetchall()
+        messages = cursor.fetchall()
+        for message in messages:
+            if message['image']:
+                image_data = message['image'].tobytes()
+                message['image'] = base64.encodebytes(image_data).decode('utf-8')
+            if message['dislikes'] is None:
+                message['dislikes'] = 0
+        return messages
 
     def get_message_replies(self, mid):
         pass
