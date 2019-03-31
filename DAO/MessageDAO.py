@@ -1,31 +1,43 @@
 from dateutil.relativedelta import relativedelta
 
-from DAO.DAO import DAO
+from DAO.DAO import DAO, encode_message_images
 
 
 class MessageDAO(DAO):
 
     def get_all_messages(self):
+        """
+        Gets all messages from DB.
+        :return: RealDictCursor
+        """
         cursor = self.get_cursor()
-        query = "with like_count as (select count(*) as likes, mid from likes where upvote = true group by mid), " \
-                "dislike_count as (select count(*) as dislikes, mid from likes where upvote = false group by mid) " \
-                "select message, image, likes, dislikes, username, messages.created_on from messages left outer join " \
-                "like_count on messages.mid = like_count.mid left outer join multimedia on " \
-                "messages.mid = multimedia.mid left outer join dislike_count on messages.mid = dislike_count.mid " \
-                "left outer join users on messages.uid = users.uid"
+        query = 'WITH like_count AS (SELECT mid, COUNT(*) AS likes FROM likes WHERE upvote = TRUE GROUP BY mid), ' \
+                'dislike_count AS (SELECT mid, COUNT(*) as dislikes FROM likes WHERE upvote = FALSE GROUP BY mid) ' \
+                'SELECT message, image, COALESCE(likes, 0) as likes, COALESCE(dislikes, 0) as dislikes, username, ' \
+                'messages.created_on FROM messages LEFT OUTER JOIN like_count ON messages.mid = like_count.mid ' \
+                'LEFT OUTER JOIN dislike_count ON messages.mid = dislike_count.mid ' \
+                'LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid'
         cursor.execute(query)
-        return cursor.fetchall()
+        messages = encode_message_images(cursor.fetchall())
+        return messages
 
     def get_message(self, mid):
+        """
+        Gets message from DB with specified id
+        :param mid: int
+        :return: RealDictCursor
+        """
         cursor = self.get_cursor()
-        query = "with like_count as (select count(*) as likes, mid from likes where upvote = true group by mid), " \
-                "dislike_count as (select count(*) as dislikes, mid from likes where upvote = false group by mid) " \
-                "select message, image, likes, dislikes, username, messages.created_on from messages left outer join " \
-                "like_count on messages.mid = like_count.mid left outer join multimedia on " \
-                "messages.mid = multimedia.mid left outer join dislike_count on messages.mid = dislike_count.mid " \
-                "left outer join users on messages.uid = users.uid where messages.mid = %s"
+        query = 'WITH like_count AS (SELECT mid, COUNT(*) AS likes FROM likes WHERE upvote = TRUE GROUP BY mid), ' \
+                'dislike_count AS (SELECT mid, COUNT(*) as dislikes FROM likes WHERE upvote = FALSE GROUP BY mid) ' \
+                'SELECT message, image, COALESCE(likes, 0) as likes, COALESCE(dislikes, 0) as dislikes, username, ' \
+                'messages.created_on FROM messages LEFT OUTER JOIN like_count ON messages.mid = like_count.mid ' \
+                'LEFT OUTER JOIN dislike_count ON messages.mid = dislike_count.mid ' \
+                'LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid ' \
+                'WHERE messages.mid = %s'
         cursor.execute(query, (mid,))
-        return cursor.fetchall()
+        messages = encode_message_images(cursor.fetchall())
+        return messages
 
     def get_message_replies(self, mid):
         pass
@@ -37,18 +49,28 @@ class MessageDAO(DAO):
         return cursor.fetchall()
 
     def get_list_of_likers_message(self, mid):
+        """
+        Gets list of users who have liked a message with the given id.
+        :param mid: int
+        :return: RealDictCursor
+        """
         cursor = self.get_cursor()
-        query = "SELECT users.uid, users.username " \
-                "FROM users INNER JOIN messages ON messages.mid = %s AND messages.uid = users.uid " \
-                "INNER JOIN likes ON messages.mid = likes.mid AND likes.upvote = TRUE "
+        query = 'SELECT users.uid, users.username ' \
+                'FROM users INNER JOIN likes ON users.uid = likes.uid AND likes.upvote = TRUE ' \
+                'INNER JOIN messages ON messages.mid = likes.mid AND messages.mid = %s'
         cursor.execute(query, (mid,))
         return cursor.fetchall()
 
     def get_list_of_dislikers_message(self, mid):
+        """
+        Gets list of users who have disliked a message with the given id.
+        :param mid: int
+        :return: RealDictCursor
+        """
         cursor = self.get_cursor()
-        query = "SELECT users.uid, users.username " \
-                "FROM users INNER JOIN messages ON messages.mid = %s AND messages.uid = users.uid " \
-                "INNER JOIN likes ON messages.mid = likes.mid AND likes.upvote = FALSE "
+        query = 'SELECT users.uid, users.username ' \
+                'FROM users INNER JOIN likes ON users.uid = likes.uid AND likes.upvote = FALSE ' \
+                'INNER JOIN messages ON messages.mid = likes.mid AND messages.mid = %s'
         cursor.execute(query, (mid,))
         return cursor.fetchall()
 
@@ -108,5 +130,3 @@ class MessageDAO(DAO):
                 "group by hid order by num desc"
         cursor.execute(query, (date, end_date))
         return cursor.fetchall()
-
-

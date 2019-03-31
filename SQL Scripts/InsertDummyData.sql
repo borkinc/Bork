@@ -47,9 +47,12 @@ INSERT INTO Chat_Group(uid, name) VALUES(5, 'Game of Phones');
 INSERT INTO Chat_Group(uid, name) VALUES(6, 'The Chamber of Secrets');
 
 -- Table: Chat_Members
--- Rows: 15
+-- Rows: 18
 INSERT INTO Chat_Members(cid, uid) VALUES (7, 11);
 INSERT INTO Chat_Members(cid, uid) VALUES (7, 6);
+INSERT INTO Chat_Members(cid, uid) VALUES (7, 3);
+INSERT INTO Chat_Members(cid, uid) VALUES (7, 5);
+INSERT INTO Chat_Members(cid, uid) VALUES (7, 2);
 INSERT INTO Chat_Members(cid, uid) VALUES (4, 3);
 INSERT INTO Chat_Members(cid, uid) VALUES (4, 2);
 INSERT INTO Chat_Members(cid, uid) VALUES (6, 12);
@@ -112,8 +115,12 @@ INSERT INTO Replies VALUES (1, 2);
 INSERT INTO Replies VALUES (3, 4);
 
 -- Table: Likes
--- Rows: 8
+-- Rows: 12
 INSERT INTO Likes VALUES (1, 6, true);
+INSERT INTO Likes VALUES (1, 11, true);
+INSERT INTO Likes VALUES (1, 3, true);
+INSERT INTO Likes VALUES (1, 5, true);
+INSERT INTO Likes VALUES (1, 2, true);
 INSERT INTO Likes VALUES (2, 11, true);
 INSERT INTO Likes VALUES (7, 6, true);
 INSERT INTO Likes VALUES (11, 8, true);
