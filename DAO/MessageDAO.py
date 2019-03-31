@@ -23,6 +23,8 @@ class MessageDAO(DAO):
                 message['image'] = base64.encodebytes(image_data).decode('utf-8')
             if message['dislikes'] is None:
                 message['dislikes'] = 0
+            if message['likes'] is None:
+                message['dislikes'] = 0
         return messages
 
     def get_message(self, mid):
@@ -40,6 +42,8 @@ class MessageDAO(DAO):
                 message['image'] = base64.encodebytes(image_data).decode('utf-8')
             if message['dislikes'] is None:
                 message['dislikes'] = 0
+            if message['likes'] is None:
+                message['likes'] = 0
         return messages
 
     def get_message_replies(self, mid):
