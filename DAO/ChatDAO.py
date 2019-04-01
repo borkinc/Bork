@@ -5,8 +5,8 @@ class ChatDAO(DAO):
 
     def get_chat_messages(self, cid):
         cursor = self.get_cursor()
-        query = "with like_count as (select count(*) as likes, mid from likes where upvote = true group by mid), " \
-                "dislike_count as (select count(*) as dislikes, mid from likes where upvote = false group by mid) " \
+        query = "with like_count as (select count(*) as likes, mid from vote where upvote = true group by mid), " \
+                "dislike_count as (select count(*) as dislikes, mid from vote where upvote = false group by mid) " \
                 "select messages.mid, message, image, COALESCE(likes, 0) as likes, " \
                 "COALESCE(dislikes, 0) as dislikes, username, messages.created_on, messages.uid " \
                 "from messages left outer join " \
@@ -25,15 +25,18 @@ class ChatDAO(DAO):
 
     def get_chat(self, cid):
         cursor = self.get_cursor()
-        query = "SELECT chat_group.cid, chat_group.name, chat_group.uid, messages.message, messages.created_on " \
-                "FROM chat_group INNER JOIN messages ON chat_group.cid = %s AND messages.cid = chat_group.cid " \
-                "ORDER BY messages.created_on DESC LIMIT 1"
+        query = 'SELECT chat_group.cid, chat_group.name, chat_group.uid, messages.message, messages.created_on, ' \
+                'chat_group.uid FROM chat_group LEFT OUTER JOIN messages ON messages.cid = chat_group.cid ' \
+                'WHERE chat_group.cid = %s LIMIT 1'
         cursor.execute(query, (cid,))
         return cursor.fetchall()
 
     def get_members_from_chat(self, cid):
         cursor = self.get_cursor()
-        query = "select * from chat_members natural inner join users where cid = %s"
+        query = 'WITH ChatMembers as (SELECT cid, uid FROM chat_members UNION SELECT cid, uid FROM chat_group)' \
+                'SELECT uid, username ' \
+                'FROM  ChatMembers NATURAL INNER JOIN users ' \
+                'WHERE cid = %s'
         cursor.execute(query, (cid,))
         return cursor.fetchall()
 

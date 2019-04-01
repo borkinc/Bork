@@ -18,48 +18,10 @@ class UserHandler:
         self.dao = UserDAO()
 
     def get_users(self):
-        users = [
-            {
-                'uid': 1,
-                'username': 'ninja',
-                'password': self.password,
-                'email': self.email,
-                'first_name': self.first_name,
-                'last_name': self.last_name,
-                'phone': self.phone
-            },
-            {
-                'uid': 2,
-                'username': 'pewdiepie',
-                'password': self.password,
-                'email': self.email,
-                'first_name': self.first_name,
-                'last_name': self.last_name,
-                'phone': self.phone
-            },
-            {
-                'uid': 3,
-                'username': 'markiplier',
-                'password': self.password,
-                'email': self.email,
-                'first_name': self.first_name,
-                'last_name': self.last_name,
-                'phone': self.phone
-            }
-        ]
-        return users
+        return self.dao.get_all_users()
 
     def get_user_by_username(self, username):
-        user = {
-            'uid': 1,
-            'username': 'ninja',
-            'password': self.password,
-            'email': self.email,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'phone': self.phone
-        }
-        return user
+        return self.dao.get_user_by_username(username)
 
     def get_user_by_id(self, uid):
         return self.dao.get_user(uid)
@@ -91,11 +53,6 @@ class UserHandler:
         """
         # token = self.encode_auth_token(10)
         return 10
-
-    def get_user_by_username(self, username):
-        # TODO: Method should be something along the lines of verify_user_password
-        password = bcrypt.hashpw('password'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        return {'username': username, 'uid': 1, 'password': password}
 
     def verify_password(self, username, password):
         user = self.userDAO.get_user_by_username(username)
