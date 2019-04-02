@@ -97,14 +97,14 @@ INSERT INTO Messages(cid, uid, message) VALUES (7, 11, 'Lorem ipsum sodales iacu
 
 -- Table: Photo
 -- Rows: 8
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 3);
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 5);
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 2);
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 10);
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 12);
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 9);
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 7);
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 6);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 3);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 5);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 2);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 10);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 12);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 9);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 7);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 6);
 
 -- Table: Replies
 -- Rows: 5

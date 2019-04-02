@@ -104,5 +104,5 @@ class MessageHandler:
             hashtag_day = []
             for j, hashtag in enumerate(hashtags):
                 hashtag_day.append({'hashtag': hashtag['hashtag'], 'position': j+1})
-            trending_hashtags.append({'day': day_to_get, 'hashtags': hashtag_day}.copy())
+            trending_hashtags.append({'day': day_to_get, 'hashtags': hashtag_day})
         return jsonify(trending_hashtags)
