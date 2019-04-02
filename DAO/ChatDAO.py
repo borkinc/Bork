@@ -5,8 +5,8 @@ class ChatDAO(DAO):
 
     def get_chat_messages(self, cid):
         cursor = self.get_cursor()
-        query = "with like_count as (select count(*) as likes, mid from likes where upvote = true group by mid), " \
-                "dislike_count as (select count(*) as dislikes, mid from likes where upvote = false group by mid) " \
+        query = "with like_count as (select count(*) as likes, mid from vote where upvote = true group by mid), " \
+                "dislike_count as (select count(*) as dislikes, mid from vote where upvote = false group by mid) " \
                 "select messages.mid, message, image, COALESCE(likes, 0) as likes, " \
                 "COALESCE(dislikes, 0) as dislikes, username, messages.created_on, messages.uid " \
                 "from messages left outer join " \

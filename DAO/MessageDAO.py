@@ -11,8 +11,8 @@ class MessageDAO(DAO):
         :return: RealDictCursor
         """
         cursor = self.get_cursor()
-        query = 'WITH like_count AS (SELECT mid, COUNT(*) AS likes FROM likes WHERE upvote = TRUE GROUP BY mid), ' \
-                'dislike_count AS (SELECT mid, COUNT(*) as dislikes FROM likes WHERE upvote = FALSE GROUP BY mid) ' \
+        query = 'WITH like_count AS (SELECT mid, COUNT(*) AS likes FROM vote WHERE upvote = TRUE GROUP BY mid), ' \
+                'dislike_count AS (SELECT mid, COUNT(*) as dislikes FROM vote WHERE upvote = FALSE GROUP BY mid) ' \
                 'SELECT message, image, COALESCE(likes, 0) as likes, COALESCE(dislikes, 0) as dislikes, username, ' \
                 'messages.created_on FROM messages LEFT OUTER JOIN like_count ON messages.mid = like_count.mid ' \
                 'LEFT OUTER JOIN dislike_count ON messages.mid = dislike_count.mid ' \
@@ -28,8 +28,8 @@ class MessageDAO(DAO):
         :return: RealDictCursor
         """
         cursor = self.get_cursor()
-        query = 'WITH like_count AS (SELECT mid, COUNT(*) AS likes FROM likes WHERE upvote = TRUE GROUP BY mid), ' \
-                'dislike_count AS (SELECT mid, COUNT(*) as dislikes FROM likes WHERE upvote = FALSE GROUP BY mid) ' \
+        query = 'WITH like_count AS (SELECT mid, COUNT(*) AS likes FROM vote WHERE upvote = TRUE GROUP BY mid), ' \
+                'dislike_count AS (SELECT mid, COUNT(*) as dislikes FROM vote WHERE upvote = FALSE GROUP BY mid) ' \
                 'SELECT message, image, COALESCE(likes, 0) as likes, COALESCE(dislikes, 0) as dislikes, username, ' \
                 'messages.created_on FROM messages LEFT OUTER JOIN like_count ON messages.mid = like_count.mid ' \
                 'LEFT OUTER JOIN dislike_count ON messages.mid = dislike_count.mid ' \
@@ -44,7 +44,7 @@ class MessageDAO(DAO):
 
     def get_likes_message(self, mid):
         cursor = self.get_cursor()
-        query = "select count(*) from Likes where mid = %s and upvote = true"
+        query = "select count(*) from vote where mid = %s and upvote = true"
         cursor.execute(query, (mid,))
         return cursor.fetchall()
 
@@ -56,8 +56,8 @@ class MessageDAO(DAO):
         """
         cursor = self.get_cursor()
         query = 'SELECT users.uid, users.username ' \
-                'FROM users INNER JOIN likes ON users.uid = likes.uid AND likes.upvote = TRUE ' \
-                'INNER JOIN messages ON messages.mid = likes.mid AND messages.mid = %s'
+                'FROM users INNER JOIN vote ON users.uid = vote.uid AND vote.upvote = TRUE ' \
+                'INNER JOIN messages ON messages.mid = vote.mid AND messages.mid = %s'
         cursor.execute(query, (mid,))
         return cursor.fetchall()
 
@@ -69,8 +69,8 @@ class MessageDAO(DAO):
         """
         cursor = self.get_cursor()
         query = 'SELECT users.uid, users.username ' \
-                'FROM users INNER JOIN likes ON users.uid = likes.uid AND likes.upvote = FALSE ' \
-                'INNER JOIN messages ON messages.mid = likes.mid AND messages.mid = %s'
+                'FROM users INNER JOIN vote ON users.uid = vote.uid AND vote.upvote = FALSE ' \
+                'INNER JOIN messages ON messages.mid = vote.mid AND messages.mid = %s'
         cursor.execute(query, (mid,))
         return cursor.fetchall()
 
@@ -91,7 +91,7 @@ class MessageDAO(DAO):
     def get_num_likes_daily(self, date, like):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select count(*) as num from likes where liked_on > %s and liked_on < %s and upvote = %s"
+        query = "select count(*) as num from vote where liked_on > %s and liked_on < %s and upvote = %s"
         cursor.execute(query, (date, end_date, like))
         count = cursor.fetchall()
         return count[0]['num']
@@ -116,8 +116,8 @@ class MessageDAO(DAO):
     def get_num_like_photos_daily(self, pid, date, like):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select count(*) as num likes from likes where likes.mid = %s " \
-                "and likes.upvote = %s and created_on > %s and created_on < %s"
+        query = "select count(*) as num, vote from vote where vote.mid = %s " \
+                "and vote.upvote = %s and created_on > %s and created_on < %s"
         cursor.execute(query, (pid, like, date, end_date, ))
         count = cursor.fetchall()
         return count[0]['num']
