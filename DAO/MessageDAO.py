@@ -1,6 +1,6 @@
 from dateutil.relativedelta import relativedelta
 
-from DAO.DAO import DAO, encode_message_images
+from DAO.DAO import DAO
 
 
 class MessageDAO(DAO):
@@ -18,7 +18,7 @@ class MessageDAO(DAO):
                 'LEFT OUTER JOIN dislike_count ON messages.mid = dislike_count.mid ' \
                 'LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid'
         cursor.execute(query)
-        messages = encode_message_images(cursor.fetchall())
+        messages = cursor.fetchall()
         return messages
 
     def get_message(self, mid):
@@ -36,7 +36,7 @@ class MessageDAO(DAO):
                 'LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid ' \
                 'WHERE messages.mid = %s'
         cursor.execute(query, (mid,))
-        messages = encode_message_images(cursor.fetchall())
+        messages = cursor.fetchall()
         return messages
 
     def get_message_replies(self, mid):
