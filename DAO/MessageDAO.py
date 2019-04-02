@@ -1,6 +1,6 @@
 from dateutil.relativedelta import relativedelta
 
-from DAO.DAO import DAO, encode_message_images
+from DAO.DAO import DAO
 
 
 class MessageDAO(DAO):
@@ -13,12 +13,13 @@ class MessageDAO(DAO):
         cursor = self.get_cursor()
         query = 'WITH like_count AS (SELECT mid, COUNT(*) AS likes FROM vote WHERE upvote = TRUE GROUP BY mid), ' \
                 'dislike_count AS (SELECT mid, COUNT(*) as dislikes FROM vote WHERE upvote = FALSE GROUP BY mid) ' \
-                'SELECT message, image, COALESCE(likes, 0) as likes, COALESCE(dislikes, 0) as dislikes, username, ' \
+                'SELECT mid, message, image, COALESCE(likes, 0) as likes, COALESCE(dislikes, 0) as dislikes, username, ' \
                 'messages.created_on FROM messages LEFT OUTER JOIN like_count ON messages.mid = like_count.mid ' \
                 'LEFT OUTER JOIN dislike_count ON messages.mid = dislike_count.mid ' \
-                'LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid'
+                'LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid ' \
+                'ORDER BY messages.created_on DESC'
         cursor.execute(query)
-        messages = encode_message_images(cursor.fetchall())
+        messages = cursor.fetchall()
         return messages
 
     def get_message(self, mid):
@@ -30,13 +31,13 @@ class MessageDAO(DAO):
         cursor = self.get_cursor()
         query = 'WITH like_count AS (SELECT mid, COUNT(*) AS likes FROM vote WHERE upvote = TRUE GROUP BY mid), ' \
                 'dislike_count AS (SELECT mid, COUNT(*) as dislikes FROM vote WHERE upvote = FALSE GROUP BY mid) ' \
-                'SELECT message, image, COALESCE(likes, 0) as likes, COALESCE(dislikes, 0) as dislikes, username, ' \
+                'SELECT mid, message, image, COALESCE(likes, 0) as likes, COALESCE(dislikes, 0) as dislikes, username, ' \
                 'messages.created_on FROM messages LEFT OUTER JOIN like_count ON messages.mid = like_count.mid ' \
                 'LEFT OUTER JOIN dislike_count ON messages.mid = dislike_count.mid ' \
                 'LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid ' \
-                'WHERE messages.mid = %s'
+                'WHERE messages.mid = %s ORDER BY messages.created_on DESC'
         cursor.execute(query, (mid,))
-        messages = encode_message_images(cursor.fetchall())
+        messages = cursor.fetchall()
         return messages
 
     def get_message_replies(self, mid):
@@ -55,7 +56,7 @@ class MessageDAO(DAO):
         :return: RealDictCursor
         """
         cursor = self.get_cursor()
-        query = 'SELECT users.uid, users.username ' \
+        query = 'SELECT users.uid, users.first_name, users.last_name, users.username, vote.voted_on ' \
                 'FROM users INNER JOIN vote ON users.uid = vote.uid AND vote.upvote = TRUE ' \
                 'INNER JOIN messages ON messages.mid = vote.mid AND messages.mid = %s'
         cursor.execute(query, (mid,))
@@ -68,7 +69,7 @@ class MessageDAO(DAO):
         :return: RealDictCursor
         """
         cursor = self.get_cursor()
-        query = 'SELECT users.uid, users.username ' \
+        query = 'SELECT users.uid,users.first_name, users.last_name, users.username, vote.voted_on ' \
                 'FROM users INNER JOIN vote ON users.uid = vote.uid AND vote.upvote = FALSE ' \
                 'INNER JOIN messages ON messages.mid = vote.mid AND messages.mid = %s'
         cursor.execute(query, (mid,))
@@ -125,8 +126,9 @@ class MessageDAO(DAO):
     def get_trending_hashtags_day(self, date):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select count(*) as num, hid, hashtag from hashtags_messages natural inner join messages " \
+        query = "with trending as (select count(*) as num, hid from hashtags_messages natural inner join messages " \
                 "natural inner join hashtags where messages.created_on > %s and messages.created_on < %s " \
-                "group by hid order by num desc"
+                "group by hid order by num desc limit 10)" \
+                "select hashtag from hashtags natural inner join trending"
         cursor.execute(query, (date, end_date))
         return cursor.fetchall()

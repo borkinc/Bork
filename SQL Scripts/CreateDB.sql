@@ -33,7 +33,7 @@ CREATE TABLE Messages (
 
 CREATE TABLE Photo (
     pid serial PRIMARY KEY,
-    image BYTEA NOT NULL,
+    image varchar(2083) NOT NULL,
     mid INTEGER REFERENCES Messages(mid)
 );
 
