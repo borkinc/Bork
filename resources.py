@@ -89,13 +89,7 @@ class Users(Resource):
 
     # @jwt_required
     def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('username')
-        data = parser.parse_args()
-        if 'username' in data and data['username']:
-            users = self.handler.get_user(username='ninja')
-        else:
-            users = self.handler.get_users()
+        users = self.handler.get_users()
         return jsonify(users=users)
 
     # @jwt_required
@@ -114,9 +108,13 @@ class User(Resource):
     def __init__(self):
         self.handler = UserHandler()
 
-    def get(self, uid):
-        user = self.handler.get_user_by_id(uid)
-        return jsonify(user=user)
+    def get(self, user):
+        if user.isdigit():
+            _user = self.handler.get_user_by_id(user)
+        else:
+            _user = self.handler.get_user_by_username(user)
+        return jsonify(user=_user)
+
 
 
 class Chats(Resource):
@@ -237,6 +235,13 @@ class Chat(Resource):
         data = self.parser.parse_args()
         chat = ChatHandler().remove_contact_from_chat_group(1)
         return jsonify(chat=chat)
+
+
+class ChatMembers(Resource):
+
+    def get(self, cid):
+        chat_members = ChatHandler().get_chat_members(cid)
+        return jsonify(chat_members=chat_members)
 
 
 class ChatMessages(Resource):
