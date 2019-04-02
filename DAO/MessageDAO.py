@@ -128,6 +128,6 @@ class MessageDAO(DAO):
         query = "with trending as (select count(*) as num, hid from hashtags_messages natural inner join messages " \
                 "natural inner join hashtags where messages.created_on > %s and messages.created_on < %s " \
                 "group by hid order by num desc limit 10)" \
-                "select hashtag from hashtags inner join trending on trending.hid = hashtags.hid"
+                "select hashtag from hashtags natural inner join trending"
         cursor.execute(query, (date, end_date))
         return cursor.fetchall()

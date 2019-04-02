@@ -31,7 +31,7 @@ CREATE TABLE Messages (
 );
 
 CREATE TABLE Photo (
-    image varchar(100) NOT NULL,
+    image varchar(2083) NOT NULL,
     mid INTEGER REFERENCES Messages(mid) Primary Key
 );
 
