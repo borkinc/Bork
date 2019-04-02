@@ -55,7 +55,7 @@ class MessageDAO(DAO):
         :return: RealDictCursor
         """
         cursor = self.get_cursor()
-        query = 'SELECT users.uid, users.username ' \
+        query = 'SELECT users.uid, users.first_name, users.last_name, likes.liked_on ' \
                 'FROM users INNER JOIN likes ON users.uid = likes.uid AND likes.upvote = TRUE ' \
                 'INNER JOIN messages ON messages.mid = likes.mid AND messages.mid = %s'
         cursor.execute(query, (mid,))
@@ -68,7 +68,7 @@ class MessageDAO(DAO):
         :return: RealDictCursor
         """
         cursor = self.get_cursor()
-        query = 'SELECT users.uid, users.username ' \
+        query = 'SELECT users.uid, users.first_name, usera.last_name, likes.liked_on ' \
                 'FROM users INNER JOIN likes ON users.uid = likes.uid AND likes.upvote = FALSE ' \
                 'INNER JOIN messages ON messages.mid = likes.mid AND messages.mid = %s'
         cursor.execute(query, (mid,))
