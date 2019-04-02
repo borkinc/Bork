@@ -1,11 +1,10 @@
 import os
 
-from flask import Flask, request
+from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
-from Handlers.Chat import ChatHandler
 from Handlers.Message import MessageHandler
 from Handlers.Users import UserHandler
 from resources import UserRegistration, TokenRefresh, UserLogin, Chats, Index, ChatMessages, Contacts, Users, Chat, \
@@ -23,7 +22,7 @@ jwt = JWTManager(app)
 
 @app.route('/stats/trending')
 def trending_topics():
-    return ChatHandler().get_trending_hashtags(request), 200
+    return MessageHandler().get_trending_hashtags(), 200
 
 
 @app.route('/stats/messages')

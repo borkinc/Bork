@@ -33,73 +33,76 @@ class MessageHandler:
         return self.dao.dislike_message(mid)
 
     def get_num_messages_daily(self):
-        today = datetime.datetime.today()
+        today = datetime.date.today()
         num_posts = []
         for i in range(7):
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_messages_daily(day_to_get)
-            num_posts.append({'%s' % day_to_get: num})
-        return jsonify(result=num_posts)
+            num_posts.append({'day': day_to_get, 'total': num})
+        return jsonify(num_posts)
 
     def get_num_likes_daily(self):
-        today = datetime.datetime.today()
+        today = datetime.date.today()
         num_likes = []
         for i in range(7):
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_likes_daily(day_to_get, True)
-            num_likes.append({'%s' % day_to_get: num})
+            num_likes.append({'day': day_to_get, 'total': num})
         return jsonify(result=num_likes)
 
     def get_num_dislikes_daily(self):
-        today = datetime.datetime.today()
+        today = datetime.date.today()
         num_dislikes = []
         for i in range(7):
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_likes_daily(day_to_get, False)
-            num_dislikes.append({'%s' % day_to_get: num})
+            num_dislikes.append({'day': day_to_get, 'total': num})
         return jsonify(result=num_dislikes)
 
     def get_num_replies_daily(self):
-        today = datetime.datetime.today()
+        today = datetime.date.today()
         num_replies = []
         for i in range(7):
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_replies_daily(day_to_get)
-            num_replies.append({'%s' % day_to_get: num})
+            num_replies.append({'day': day_to_get, 'total': num})
         return jsonify(result=num_replies)
 
     def get_num_replies_photo(self, pid):
-        today = datetime.datetime.today()
+        today = datetime.date.today()
         num_replies = []
         for i in range(7):
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_replies_photos_daily(pid, day_to_get)
-            num_replies.append({'%s' % day_to_get: num})
+            num_replies.append({'day': day_to_get, 'total': num})
         return jsonify(result=num_replies)
 
     def get_num_likes_photo(self, pid):
-        today = datetime.datetime.today()
+        today = datetime.date.today()
         num_likes = []
         for i in range(7):
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_like_photos_daily(pid, day_to_get, True)
-            num_likes.append({'%s' % day_to_get: num})
+            num_likes.append({'day': day_to_get, 'total': num})
         return jsonify(result=num_likes)
 
     def get_num_dislikes_photo(self, pid):
-        today = datetime.datetime.today()
+        today = datetime.date.today()
         num_likes = []
         for i in range(7):
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_like_photos_daily(pid, day_to_get, False)
-            num_likes.append({'%s' % day_to_get: num})
+            num_likes.append({'day': day_to_get, 'total': num})
         return jsonify(result=num_likes)
 
     def get_trending_hashtags(self):
-        today = datetime.datetime.today()
-        hashtags = []
+        today = datetime.date.today()
+        trending_hashtags = []
         for i in range(7):
             day_to_get = today - relativedelta(days=i)
             hashtags = self.dao.get_trending_hashtags_day(day_to_get)
-            hashtags.append({'%s' % day_to_get: hashtags})
-        return jsonify(result=hashtags)
+            hashtag_day = []
+            for j, hashtag in enumerate(hashtags):
+                hashtag_day.append({'hashtag': hashtag['hashtag'], 'position': j+1})
+            trending_hashtags.append({'day': day_to_get, 'hashtags': hashtag_day}.copy())
+        return jsonify(trending_hashtags)

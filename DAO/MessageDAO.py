@@ -18,9 +18,6 @@ class MessageDAO(DAO):
         cursor.execute(query)
         messages = cursor.fetchall()
         for message in messages:
-            if message['image']:
-                image_data = message['image'].tobytes()
-                message['image'] = base64.encodebytes(image_data).decode('utf-8')
             if message['dislikes'] is None:
                 message['dislikes'] = 0
             if message['likes'] is None:
@@ -122,9 +119,10 @@ class MessageDAO(DAO):
     def get_trending_hashtags_day(self, date):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select count(*) as num, hid, hashtag from hashtags_messages natural inner join messages " \
+        query = "with trending as (select count(*) as num, hid from hashtags_messages natural inner join messages " \
                 "natural inner join hashtags where messages.created_on > %s and messages.created_on < %s " \
-                "group by hid order by num desc"
+                "group by hid order by num desc limit 10)" \
+                "select hashtag from hashtags inner join trending on trending.hid = hashtags.hid"
         cursor.execute(query, (date, end_date))
         return cursor.fetchall()
 
