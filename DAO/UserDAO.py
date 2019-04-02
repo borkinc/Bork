@@ -27,9 +27,14 @@ class UserDAO(DAO):
         return cursor.fetchall()
 
     def get_contacts(self, uid):
+        """
+        Gets list of users who are contacts of given user id
+        :param uid: int
+        :return: RealDictCursor
+        """
         cursor = self.get_cursor()
-        query = 'select username, first_name, last_name from contacts, users inner join on contact_id = uid ' \
-                'where owner_id = %s'
+        query = 'SELECT username, first_name, last_name ' \
+                'FROM users INNER JOIN contacts ON contacts.owner_id = %s AND users.uid = contacts.contact_id'
         cursor.execute(query, (uid,))
         return cursor.fetchall()
 
@@ -43,7 +48,7 @@ class UserDAO(DAO):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
         query = "select count(*) as num from messages where messages.uid = %s and created_on > %s and created_on < %s"
-        cursor.execute(query, (uid, date, end_date, ))
+        cursor.execute(query, (uid, date, end_date,))
         count = cursor.fetchall()
         return count[0]['num']
 

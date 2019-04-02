@@ -289,7 +289,7 @@ class LikeChatMessage(Resource):
 
     def get(self, mid):
         likers = self.handler.get_likers(mid)
-        return jsonify(likers=likers)
+        return jsonify(likers=likers, likes=len(likers))
 
     # @jwt_required
     def post(self, mid):
@@ -304,7 +304,7 @@ class DislikeChatMessage(Resource):
 
     def get(self, mid):
         dislikers = MessageHandler().get_dislikers(mid)
-        return jsonify(dislikers=dislikers)
+        return jsonify(dislikers=dislikers, dislikes=len(dislikers))
 
     # @jwt_required
     def post(self, mid):
