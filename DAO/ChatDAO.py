@@ -12,7 +12,8 @@ class ChatDAO(DAO):
                 "from messages left outer join " \
                 "like_count on messages.mid = like_count.mid left outer join photo on " \
                 "messages.mid = photo.mid left outer join dislike_count on messages.mid = dislike_count.mid " \
-                "left outer join users on messages.uid = users.uid where messages.cid = %s"
+                "left outer join users on messages.uid = users.uid where messages.cid = %s " \
+                "ORDER BY messages.created_on DESC"
         cursor.execute(query, (cid,))
         messages = cursor.fetchall()
         return messages

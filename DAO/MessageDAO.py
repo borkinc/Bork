@@ -16,7 +16,8 @@ class MessageDAO(DAO):
                 'SELECT message, image, COALESCE(likes, 0) as likes, COALESCE(dislikes, 0) as dislikes, username, ' \
                 'messages.created_on FROM messages LEFT OUTER JOIN like_count ON messages.mid = like_count.mid ' \
                 'LEFT OUTER JOIN dislike_count ON messages.mid = dislike_count.mid ' \
-                'LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid'
+                'LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid ' \
+                'ORDER BY messages.created_on DESC'
         cursor.execute(query)
         messages = cursor.fetchall()
         return messages
@@ -34,7 +35,7 @@ class MessageDAO(DAO):
                 'messages.created_on FROM messages LEFT OUTER JOIN like_count ON messages.mid = like_count.mid ' \
                 'LEFT OUTER JOIN dislike_count ON messages.mid = dislike_count.mid ' \
                 'LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid ' \
-                'WHERE messages.mid = %s'
+                'WHERE messages.mid = %s ORDER BY messages.created_on DESC'
         cursor.execute(query, (mid,))
         messages = cursor.fetchall()
         return messages
