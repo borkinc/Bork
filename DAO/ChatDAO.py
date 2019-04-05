@@ -4,6 +4,11 @@ from DAO.DAO import DAO
 class ChatDAO(DAO):
 
     def get_chat_messages(self, cid):
+        """
+        Gets all messages belonging to specified chat with given id
+        :param cid: int
+        :return: RealDictCursor
+        """
         cursor = self.get_cursor()
         query = "with like_count as (select count(*) as likes, mid from vote where upvote = true group by mid), " \
                 "dislike_count as (select count(*) as dislikes, mid from vote where upvote = false group by mid) " \
@@ -16,6 +21,11 @@ class ChatDAO(DAO):
                 "ORDER BY messages.created_on DESC"
         cursor.execute(query, (cid,))
         messages = cursor.fetchall()
+
+        # Storing datetime object as a string in ISO format to facilitate timezone handling
+        for message in messages:
+            message['created_on'] = message['created_on'].isoformat()
+
         return messages
 
     def get_all_chats(self):
