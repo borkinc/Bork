@@ -116,7 +116,6 @@ class User(Resource):
         return jsonify(user=_user)
 
 
-
 class Chats(Resource):
 
     # @jwt_required
@@ -259,11 +258,15 @@ class ChatMessages(Resource):
     # @jwt_required
     def post(self, chat_id):
         parser = reqparse.RequestParser()
+        parser.add_argument('uid', help=HELP_TEXT, required=True)
         parser.add_argument('message', help=HELP_TEXT, required=True)
         parser.add_argument('img')
         data = parser.parse_args()
-        message = ChatHandler().insert_chat_message(message='message',
-                                                    img='/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png')
+        if 'img' in data and data['img']:
+            message = ChatHandler().insert_chat_message(cid=chat_id, uid=data['uid'], message=data['message'],
+                                                        img=data['img'])
+        else:
+            message = ChatHandler().insert_chat_message(cid=chat_id, uid=data['uid'], message=data['message'])
         return jsonify(message=message)
 
 

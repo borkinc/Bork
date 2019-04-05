@@ -132,3 +132,11 @@ class MessageDAO(DAO):
                 "select hashtag from hashtags natural inner join trending"
         cursor.execute(query, (date, end_date))
         return cursor.fetchall()
+
+    def insert_message(self, cid, uid, message, img):
+        cursor = self.get_cursor()
+        query = 'INSERT INTO messages (cid, uid, message) VALUES(%s, %s, %s) RETURNING mid'
+        cursor.execute(query, (cid, uid, message))
+        cursor.connection.commit()
+        message_id = cursor.fetchone()['mid']
+        return message_id
