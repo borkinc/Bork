@@ -120,13 +120,7 @@ class Chats(Resource):
 
     # @jwt_required
     def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('cid')
-        data = parser.parse_args()
-        if 'cid' in data and data['cid']:
-            chats = ChatHandler().get_chat(data['cid'])
-        else:
-            chats = ChatHandler().get_chats()
+        chats = ChatHandler().get_chats()
         return jsonify(chats=chats)
 
     # @jwt_required
@@ -156,18 +150,6 @@ class Contacts(Resource):
 
     def __init__(self):
         self.handler = UserHandler()
-
-    # @jwt_required
-    def get(self):
-        """
-        Retrieves all contacts from database
-        :return: JSON
-        """
-        parser = reqparse.RequestParser()
-        parser.add_argument('uid', help=HELP_TEXT, required=True)
-        data = parser.parse_args()
-        contacts = self.handler.get_contacts(1)
-        return jsonify(contacts=contacts)
 
     # @jwt_required
     def post(self):
