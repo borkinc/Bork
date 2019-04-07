@@ -16,7 +16,8 @@ class UserDAO(DAO):
 
     def get_all_users(self):
         cursor = self.get_cursor()
-        query = 'select username, first_name, last_name, email, phone_number from users;'
+        query = 'SELECT uid, username, first_name, last_name, email, phone_number ' \
+                'FROM users'
         cursor.execute(query)
         return cursor.fetchall()
 
@@ -40,7 +41,9 @@ class UserDAO(DAO):
 
     def get_user_by_username(self, username):
         cursor = self.get_cursor()
-        query = 'select uid, username, password from users where username = %s'
+        query = 'SELECT username, first_name, last_name, email, phone_number ' \
+                'FROM users ' \
+                'WHERE username = %s'
         cursor.execute(query, (username,))
         return cursor.fetchall()
 

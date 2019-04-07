@@ -108,9 +108,13 @@ class User(Resource):
     def __init__(self):
         self.handler = UserHandler()
 
-    def get(self, uid):
-        user = self.handler.get_user_by_id(uid)
-        return jsonify(user=user)
+    def get(self, user):
+        if user.isdigit():
+            _user = self.handler.get_user_by_id(user)
+        else:
+            _user = self.handler.get_user_by_username(user)
+        return jsonify(user=_user)
+
 
 
 class Chats(Resource):
@@ -226,12 +230,9 @@ class Chat(Resource):
 
 class ChatMembers(Resource):
 
-    def __init__(self):
-        self.handler = ChatHandler()
-
     def get(self, cid):
-        members = self.handler.get_chat_members(cid)
-        return jsonify(members=members)
+        chat_members = ChatHandler().get_chat_members(cid)
+        return jsonify(chat_members=chat_members)
 
 
 class ChatOwner(Resource):

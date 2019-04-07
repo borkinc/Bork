@@ -12,7 +12,8 @@ CREATE TABLE Users (
 CREATE TABLE Chat_Group (
     cid serial PRIMARY KEY,
     uid INTEGER REFERENCES Users(uid),
-    name varchar(25) NOT NULL
+    name varchar(25) NOT NULL,
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Chat_Members (
@@ -31,8 +32,9 @@ CREATE TABLE Messages (
 );
 
 CREATE TABLE Photo (
-    image varchar(100) NOT NULL,
-    mid INTEGER REFERENCES Messages(mid) Primary Key
+    pid serial PRIMARY KEY,
+    image varchar(2083) NOT NULL,
+    mid INTEGER REFERENCES Messages(mid)
 );
 
 CREATE TABLE Replies (
@@ -41,10 +43,10 @@ CREATE TABLE Replies (
     PRIMARY KEY(replied_to, reply)
 );
 
-CREATE TABLE Likes(
+CREATE TABLE Vote(
     mid INTEGER REFERENCES Messages(mid),
     uid INTEGER REFERENCES Users(uid),
-    liked_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    voted_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     upvote BOOLEAN NOT NULL,
     PRIMARY KEY(mid, uid)
 );

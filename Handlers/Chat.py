@@ -90,3 +90,5 @@ class ChatHandler:
         }
         return message
 
+    def get_chat_members(self, cid):
+        return self.chatDAO.get_members_from_chat(cid)

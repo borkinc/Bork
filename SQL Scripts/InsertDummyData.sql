@@ -97,14 +97,14 @@ INSERT INTO Messages(cid, uid, message) VALUES (7, 11, 'Lorem ipsum sodales iacu
 
 -- Table: Photo
 -- Rows: 8
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 3);
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 5);
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 2);
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 10);
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 12);
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 9);
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 7);
-INSERT INTO Photo VALUES ('static/test_url.jpeg', 6);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 3);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 5);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 2);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 10);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 12);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 9);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 7);
+INSERT INTO Photo VALUES ('static/img/test_url.jpeg', 6);
 
 -- Table: Replies
 -- Rows: 5
@@ -114,20 +114,20 @@ INSERT INTO Replies VALUES (7, 11);
 INSERT INTO Replies VALUES (1, 2);
 INSERT INTO Replies VALUES (3, 4);
 
--- Table: Likes
+-- Table: Vote
 -- Rows: 12
-INSERT INTO Likes (mid, uid, upvote)VALUES (1, 6, true);
-INSERT INTO Likes (mid, uid, upvote)VALUES (1, 11, true);
-INSERT INTO Likes (mid, uid, upvote)VALUES (1, 3, true);
-INSERT INTO Likes (mid, uid, upvote)VALUES (1, 5, true);
-INSERT INTO Likes (mid, uid, upvote)VALUES (1, 2, true);
-INSERT INTO Likes (mid, uid, upvote)VALUES (2, 11, true);
-INSERT INTO Likes (mid, uid, upvote)VALUES (7, 6, true);
-INSERT INTO Likes (mid, uid, upvote)VALUES (11, 8, true);
-INSERT INTO Likes (mid, uid, upvote)VALUES (3, 3, false);
-INSERT INTO Likes (mid, uid, upvote)VALUES (4, 2, false);
-INSERT INTO Likes (mid, uid, upvote)VALUES (8, 8, false);
-INSERT INTO Likes (mid, uid, upvote)VALUES (12, 7, false);
+INSERT INTO Vote(mid, uid, upvote) VALUES (1, 6, true);
+INSERT INTO Vote(mid, uid, upvote) VALUES (1, 11, true);
+INSERT INTO Vote(mid, uid, upvote) VALUES (1, 3, true);
+INSERT INTO Vote(mid, uid, upvote) VALUES (1, 5, true);
+INSERT INTO Vote(mid, uid, upvote) VALUES (1, 2, true);
+INSERT INTO Vote(mid, uid, upvote) VALUES (2, 11, true);
+INSERT INTO Vote(mid, uid, upvote) VALUES (7, 6, true);
+INSERT INTO Vote(mid, uid, upvote) VALUES (11, 8, true);
+INSERT INTO Vote(mid, uid, upvote) VALUES (3, 3, false);
+INSERT INTO Vote(mid, uid, upvote) VALUES (4, 2, false);
+INSERT INTO Vote(mid, uid, upvote) VALUES (8, 8, false);
+INSERT INTO Vote(mid, uid, upvote) VALUES (12, 7, false);
 
 -- Table: Contacts
 -- Rows: 12
