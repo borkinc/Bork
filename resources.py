@@ -153,15 +153,6 @@ class Contacts(Resource):
         self.handler = UserHandler()
 
     # @jwt_required
-    def get(self):
-        """
-        Retrieves all contacts from database
-        :return: JSON
-        """
-        contacts = self.handler.get_contacts(1)
-        return jsonify(contacts=contacts)
-
-    # @jwt_required
     def post(self):
 
         parser = reqparse.RequestParser()
@@ -233,16 +224,6 @@ class ChatMembers(Resource):
     def get(self, cid):
         chat_members = ChatHandler().get_chat_members(cid)
         return jsonify(chat_members=chat_members)
-
-
-class ChatOwner(Resource):
-
-    def __init__(self):
-        self.handler = ChatHandler()
-
-    def get(self, cid):
-        owner = self.handler.get_chat_owner(cid)
-        return jsonify(owner=owner)
 
 
 class ChatMessages(Resource):
