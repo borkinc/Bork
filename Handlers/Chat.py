@@ -1,3 +1,7 @@
+import uuid
+
+from werkzeug.utils import secure_filename
+
 from DAO.ChatDAO import ChatDAO
 from DAO.MessageDAO import MessageDAO
 
@@ -24,6 +28,12 @@ class ChatHandler:
         return cid
 
     def insert_chat_message(self, cid, uid, message, img=None):
+        if img:
+            img.filename = f'{uuid.uuid4()}{img.filename}'
+            filename = secure_filename(img.filename)
+            from app import ROOT_DIR
+            img.save(f'{ROOT_DIR}\\static\\img\\{filename}')
+            img = f'static/img/{filename}'
         return self.messageDAO.insert_message(cid, uid, message, img)
 
     def add_contact_to_chat_group(self, contact_id):

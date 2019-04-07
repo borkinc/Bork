@@ -17,6 +17,8 @@ cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 api = Api(app, prefix='/api')
 jwt = JWTManager(app)
 
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 # ------------------------statistics-------------------------------
 

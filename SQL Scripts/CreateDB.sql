@@ -1,34 +1,34 @@
 CREATE TABLE Users (
-    uid SERIAL PRIMARY KEY,
-    username varchar(30) UNIQUE NOT NULL,
-    password varchar(100) NOT NULL,
-    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    email varchar(100) UNIQUE NOT NULL,
-    first_name varchar(30) NOT NULL,
-    last_name varchar(30) NOT NULL,
-    phone_number varchar(10) NOT NULL
+                       uid          SERIAL PRIMARY KEY,
+                       username     varchar(30) UNIQUE  NOT NULL,
+                       password     varchar(100)        NOT NULL,
+                       created_on   TIMESTAMPTZ         NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                       email        varchar(100) UNIQUE NOT NULL,
+                       first_name   varchar(30)         NOT NULL,
+                       last_name    varchar(30)         NOT NULL,
+                       phone_number varchar(10)         NOT NULL
 );
 
 CREATE TABLE Chat_Group (
-    cid serial PRIMARY KEY,
-    uid INTEGER REFERENCES Users(uid),
-    name varchar(25) NOT NULL,
-    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                            cid        serial PRIMARY KEY,
+                            uid        INTEGER REFERENCES Users(uid),
+                            name       varchar(25) NOT NULL,
+                            created_on TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Chat_Members (
-    cid INTEGER REFERENCES Chat_Group(cid),
-    uid INTEGER REFERENCES Users(uid),
-    joined_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (cid, uid)
+                              cid       INTEGER REFERENCES Chat_Group(cid),
+                              uid       INTEGER REFERENCES Users(uid),
+                              joined_on TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                              PRIMARY KEY (cid, uid)
 );
 
 CREATE TABLE Messages (
-    mid serial PRIMARY KEY,
-    cid INTEGER REFERENCES Chat_Group(cid),
-    uid INTEGER REFERENCES Users(uid),
-    message VARCHAR(500),
-    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                          mid        serial PRIMARY KEY,
+                          cid        INTEGER REFERENCES Chat_Group(cid),
+                          uid        INTEGER REFERENCES Users(uid),
+                          message    VARCHAR(500),
+                          created_on TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Photo (
@@ -44,11 +44,11 @@ CREATE TABLE Replies (
 );
 
 CREATE TABLE Vote(
-    mid INTEGER REFERENCES Messages(mid),
-    uid INTEGER REFERENCES Users(uid),
-    voted_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    upvote BOOLEAN NOT NULL,
-    PRIMARY KEY(mid, uid)
+                     mid      INTEGER REFERENCES Messages(mid),
+                     uid      INTEGER REFERENCES Users(uid),
+                     voted_on TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                     upvote   BOOLEAN     NOT NULL,
+                     PRIMARY KEY(mid, uid)
 );
 
 CREATE TABLE Contacts(

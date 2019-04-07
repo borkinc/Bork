@@ -137,6 +137,10 @@ class MessageDAO(DAO):
         cursor = self.get_cursor()
         query = 'INSERT INTO messages (cid, uid, message) VALUES(%s, %s, %s) RETURNING mid'
         cursor.execute(query, (cid, uid, message))
-        cursor.connection.commit()
         message_id = cursor.fetchone()['mid']
+        if img:
+            query = 'INSERT INTO photo (image, mid) VALUES (%s, %s)'
+            cursor.execute(query, (img, message_id))
+        cursor.connection.commit()
+
         return message_id

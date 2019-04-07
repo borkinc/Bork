@@ -21,11 +21,6 @@ class ChatDAO(DAO):
                 "ORDER BY messages.created_on DESC"
         cursor.execute(query, (cid,))
         messages = cursor.fetchall()
-
-        # Storing datetime object as a string in ISO format to facilitate timezone handling
-        for message in messages:
-            message['created_on'] = message['created_on'].isoformat()
-
         return messages
 
     def get_all_chats(self):
