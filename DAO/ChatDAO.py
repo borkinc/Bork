@@ -43,7 +43,8 @@ class ChatDAO(DAO):
 
     def get_owner_of_chat(self, cid):
         cursor = self.get_cursor()
-        query = "select * from chat_group natural inner join users where cid = %s"
+        query = "select uid, username, first_name, last_name, email, phone_number from chat_group natural inner join " \
+                "users where cid = %s"
         cursor.execute(query, (cid,))
         return cursor.fetchall()
 
