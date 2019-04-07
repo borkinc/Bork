@@ -17,6 +17,12 @@ class ChatHandler:
     def get_chat_messages(self, cid):
         return self.chatDAO.get_chat_messages(cid)
 
+    def get_chat_members(self, cid):
+        return self.chatDAO.get_members_from_chat(cid)
+
+    def get_chat_owner(self, cid):
+        return self.chatDAO.get_owner_of_chat(cid)
+
     def insert_chat(self, chat_name, owner_id):
         cid = self.chatDAO.insert_chat(chat_name, owner_id)
         return cid

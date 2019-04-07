@@ -8,7 +8,7 @@ from flask_restful import Api
 from Handlers.Message import MessageHandler
 from Handlers.Users import UserHandler
 from resources import UserRegistration, TokenRefresh, UserLogin, Chats, Index, ChatMessages, Contacts, Users, Chat, \
-    LikeChatMessage, DislikeChatMessage, ReplyChatMessage, User, Contact, Messages, Message
+    LikeChatMessage, DislikeChatMessage, ReplyChatMessage, User, Contact, Messages, Message, ChatMembers
 
 app = Flask(__name__)
 config = f'config.config.{os.getenv("FLASK_SETTINGS")}'
@@ -77,6 +77,8 @@ api.add_resource(Users, '/users')
 api.add_resource(User, '/user')
 api.add_resource(Chats, '/chats')
 api.add_resource(Chat, '/chat/<int:cid>')
+api.add_resource(ChatMembers, '/chat/<int:cid>/members')
+api.add_resource(ChatOwner, '/chat/<int:cid>/')
 api.add_resource(Contacts, '/contacts')
 api.add_resource(Contact, '/contacts/<int:uid>')
 api.add_resource(ChatMessages, '/chat/<int:chat_id>/messages')

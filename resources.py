@@ -89,13 +89,7 @@ class Users(Resource):
 
     # @jwt_required
     def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('username')
-        data = parser.parse_args()
-        if 'username' in data and data['username']:
-            users = self.handler.get_user(username='ninja')
-        else:
-            users = self.handler.get_users()
+        users = self.handler.get_users()
         return jsonify(users=users)
 
     # @jwt_required
@@ -123,13 +117,7 @@ class Chats(Resource):
 
     # @jwt_required
     def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('cid')
-        data = parser.parse_args()
-        if 'cid' in data and data['cid']:
-            chats = ChatHandler().get_chat(data['cid'])
-        else:
-            chats = ChatHandler().get_chats()
+        chats = ChatHandler().get_chats()
         return jsonify(chats=chats)
 
     # @jwt_required
@@ -166,9 +154,6 @@ class Contacts(Resource):
         Retrieves all contacts from database
         :return: JSON
         """
-        parser = reqparse.RequestParser()
-        parser.add_argument('uid', help=HELP_TEXT, required=True)
-        data = parser.parse_args()
         contacts = self.handler.get_contacts(1)
         return jsonify(contacts=contacts)
 
@@ -237,6 +222,26 @@ class Chat(Resource):
         data = self.parser.parse_args()
         chat = ChatHandler().remove_contact_from_chat_group(1)
         return jsonify(chat=chat)
+
+
+class ChatMembers(Resource):
+
+    def __init__(self):
+        self.handler = ChatHandler()
+
+    def get(self, cid):
+        members = self.handler.get_chat_members(cid)
+        return jsonify(members=members)
+
+
+class ChatOwner(Resource):
+
+    def __init__(self):
+        self.handler = ChatHandler()
+
+    def get(self, cid):
+        owner = self.handler.get_chat_owner(cid)
+        return jsonify(owner=owner)
 
 
 class ChatMessages(Resource):
