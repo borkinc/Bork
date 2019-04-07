@@ -1,7 +1,7 @@
 import datetime
 
 import bcrypt
-from flask import jsonify
+from flask import jsonify, request
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity
 from flask_restful import Resource, reqparse
 
@@ -114,7 +114,6 @@ class User(Resource):
         else:
             _user = self.handler.get_user_by_username(user)
         return jsonify(user=_user)
-
 
 
 class Chats(Resource):
@@ -259,11 +258,14 @@ class ChatMessages(Resource):
     # @jwt_required
     def post(self, chat_id):
         parser = reqparse.RequestParser()
+        parser.add_argument('uid', help=HELP_TEXT, required=True)
         parser.add_argument('message', help=HELP_TEXT, required=True)
-        parser.add_argument('img')
         data = parser.parse_args()
-        message = ChatHandler().insert_chat_message(message='message',
-                                                    img='/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png')
+        if 'img' in request.files and request.files['img']:
+            message = ChatHandler().insert_chat_message(cid=chat_id, uid=data['uid'], message=data['message'],
+                                                        img=request.files['img'])
+        else:
+            message = ChatHandler().insert_chat_message(cid=chat_id, uid=data['uid'], message=data['message'])
         return jsonify(message=message)
 
 
