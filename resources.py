@@ -1,8 +1,7 @@
 import datetime
 
-import bcrypt
 from flask import jsonify, request
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 from flask_restful import Resource, reqparse
 
 from Handlers.Chat import ChatHandler
@@ -20,6 +19,9 @@ class Index(Resource):
 
 class UserRegistration(Resource):
 
+    def __init__(self):
+        self.handler = UserHandler()
+
     def post(self):
         """
         Registers new user
@@ -29,16 +31,20 @@ class UserRegistration(Resource):
         parser.add_argument('username', help=HELP_TEXT, required=True)
         parser.add_argument('email', help=HELP_TEXT, required=True)
         parser.add_argument('password', help=HELP_TEXT, required=True)
+        parser.add_argument('first_name', help=HELP_TEXT, required=True)
+        parser.add_argument('last_name', help=HELP_TEXT, required=True)
+        parser.add_argument('phone_number', help=HELP_TEXT, required=True)
 
-        # Verifies needed parameters to register users are present
         data = parser.parse_args()
 
-        # Dummy data for phase I of project
-        username = 'new_user'
-        email = 'new_user@bork.com'
-        password = 'password'
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        uid = UserHandler().insert_user(username=username, email=email, password=hashed_password)
+        username = data['username']
+        email = data['email']
+        password = data['password']
+        first_name = data['first_name']
+        last_name = data['last_name']
+        phone_number = data['phone_number']
+
+        uid = self.handler.insert_user(username, password, first_name, last_name, email, phone_number)
         access_token = create_access_token(identity=username)
         refresh_token = create_refresh_token(identity=username, expires_delta=datetime.timedelta(days=365))
         user = {
@@ -67,11 +73,11 @@ class UserLogin(Resource):
         if is_authenticated:
 
             # TODO: Remove expires_delta after Phase I
-            access_token = create_access_token(identity=data['username'], expires_delta=datetime.timedelta(days=365))
-            refresh_token = create_refresh_token(identity=data['username'])
+            access_token = create_access_token(identity=user['username'], expires_delta=datetime.timedelta(days=365))
+            refresh_token = create_refresh_token(identity=user['username'])
             user = {
-                'uid': user[0]['uid'],
-                'username': data['username'],
+                'uid': user['uid'],
+                'username': user['username'],
                 'access_token': access_token,
                 'refresh_token': refresh_token
             }
@@ -113,29 +119,25 @@ class User(Resource):
             _user = self.handler.get_user_by_id(user)
         else:
             _user = self.handler.get_user_by_username(user)
-        return jsonify(user=_user)
+        return jsonify(user=user)
 
 
 class Chats(Resource):
+
+    def __init__(self):
+        self.handler = ChatHandler()
 
     # @jwt_required
     def get(self):
         chats = ChatHandler().get_chats()
         return jsonify(chats=chats)
 
-    # @jwt_required
+    @jwt_required
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('chat_name', help=HELP_TEXT, required=True)
         data = parser.parse_args()
-        if 'chat_name' in data and data['chat_name']:
-            chat_name = 'Videout'
-            chat = ChatHandler().insert_chat(chat_name)
-            msg = 'Success'
-        else:
-            chat = 'N/A'
-            msg = 'Bad request'
-        return jsonify(chat=chat, msg=msg)
+        return self.handler.insert_chat(data)
 
     # @jwt_required
     def delete(self):
@@ -151,22 +153,15 @@ class Contacts(Resource):
     def __init__(self):
         self.handler = UserHandler()
 
-    # @jwt_required
+    @jwt_required
     def post(self):
-
         parser = reqparse.RequestParser()
         parser.add_argument('first_name', help=HELP_TEXT, required=True)
         parser.add_argument('last_name', help=HELP_TEXT, required=True)
         parser.add_argument('email', help=HELP_TEXT)
         parser.add_argument('phone', help=HELP_TEXT)
         data = parser.parse_args()
-        if 'email' in data and data['email']:
-            contact = self.handler.insert_contact(first_name='first', last_name='last', email='email@email.com')
-        elif 'phone' in data and data['phone']:
-            contact = self.handler.insert_contact(first_name='first', last_name='last', phone='7875555555')
-        else:
-            return jsonify(msg='Bad request')
-        return jsonify(contact=contact)
+        return self.handler.insert_contact(data)
 
     # @jwt_required
     def put(self):
@@ -205,10 +200,10 @@ class Chat(Resource):
         chat = ChatHandler().get_chat(cid)
         return jsonify(chat=chat)
 
-    # @jwt_required
+    @jwt_required
     def post(self, cid):
         data = self.parser.parse_args()
-        chat = ChatHandler().add_contact_to_chat_group(1)
+        chat = ChatHandler().add_contact_to_chat_group(cid, data)
         return jsonify(chat=chat)
 
     # @jwt_required
@@ -237,7 +232,7 @@ class ChatMessages(Resource):
         messages = ChatHandler().get_chat_messages(chat_id)
         return jsonify(messages=messages)
 
-    # @jwt_required
+    @jwt_required
     def post(self, chat_id):
         parser = reqparse.RequestParser()
         parser.add_argument('uid', help=HELP_TEXT, required=True)
@@ -280,7 +275,7 @@ class LikeChatMessage(Resource):
         likers = self.handler.get_likers(mid)
         return jsonify(likers=likers, likes=len(likers))
 
-    # @jwt_required
+    @jwt_required
     def post(self, mid):
         message = self.handler.like_message(mid)
         return jsonify(message=message)
@@ -295,7 +290,7 @@ class DislikeChatMessage(Resource):
         dislikers = MessageHandler().get_dislikers(mid)
         return jsonify(dislikers=dislikers, dislikes=len(dislikers))
 
-    # @jwt_required
+    @jwt_required
     def post(self, mid):
         message = self.handler.dislike_message(mid)
         return jsonify(message=message)
@@ -310,13 +305,13 @@ class ReplyChatMessage(Resource):
         replies = self.handler.get_replies(mid)
         return jsonify(replies=replies)
 
-    # @jwt_required
+    @jwt_required
     def post(self, mid):
         parser = reqparse.RequestParser()
         parser.add_argument('message', help=HELP_TEXT, required=True)
         parser.add_argument('img')
         data = parser.parse_args()
-        message = ChatHandler().reply_chat_message(chat_id=1, message_id=1, message='reply')
+        message = ChatHandler().reply_chat_message(data, mid)
         return jsonify(message=message)
 
 

@@ -54,7 +54,10 @@ CREATE TABLE Vote(
 CREATE TABLE Contacts(
     owner_id Integer REFERENCES  Users(uid),
     contact_id Integer REFERENCES Users(uid),
+    first_name VARCHAR(30) NOT NULL,
+    last_name VARCHAR(30) NOT NULL,
     PRIMARY KEY(owner_id, contact_id)
+
 );
 
 CREATE TABLE Hashtags(

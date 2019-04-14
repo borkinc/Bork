@@ -1,9 +1,12 @@
 import uuid
 
+from flask import jsonify
+from flask_jwt_extended import get_jwt_identity
 from werkzeug.utils import secure_filename
 
 from DAO.ChatDAO import ChatDAO
 from DAO.MessageDAO import MessageDAO
+from DAO.UserDAO import UserDAO
 
 
 class ChatHandler:
@@ -11,6 +14,7 @@ class ChatHandler:
     def __init__(self):
         self.chatDAO = ChatDAO()
         self.messageDAO = MessageDAO()
+        self.userDAO = UserDAO()
 
     def get_chats(self):
         chats = self.chatDAO.get_all_chats()
@@ -29,9 +33,15 @@ class ChatHandler:
     def get_chat_owner(self, cid):
         return self.chatDAO.get_owner_of_chat(cid)
 
-    def insert_chat(self, chat_name, owner_id):
-        cid = self.chatDAO.insert_chat(chat_name, owner_id)
-        return cid
+    def insert_chat(self, data):
+        username = get_jwt_identity()
+        user = self.userDAO.get_user_by_username(username)
+        try:
+            cid = self.chatDAO.insert_chat_group(data['chat_name'], user.uid)
+            response = jsonify(chat=cid, msg='Success'), 201
+        except KeyError:
+            response = jsonify(chat='N/A', msg='Missing parameters'), 400
+        return response
 
     def insert_chat_message(self, cid, uid, message, img=None):
         if img:
@@ -40,23 +50,19 @@ class ChatHandler:
             from app import ROOT_DIR
             img.save(f'{ROOT_DIR}\\static\\img\\{filename}')
             img = f'static/img/{filename}'
-        return self.messageDAO.insert_message(cid, uid, message, img)
+        return self.messageDAO.insert_message(cid, uid, message, img=img)
 
-    def add_contact_to_chat_group(self, contact_id):
-        participants = [
-            {
-                'contact_id': 1
-            },
-            {
-                'contact_id': 2
-            }
-        ]
-        chat = {
-            'cid': 1,
-            'name': 'skiribops',
-            'participants': participants
-        }
-        return chat
+    def add_contact_to_chat_group(self, cid, data):
+        chat_owner_username = get_jwt_identity()
+        chat_owner_uid = self.userDAO.get_user_by_username(chat_owner_username)['uid']
+        user_to_add = data['contact_id']
+        chat_owner = self.chatDAO.get_owner_of_chat(cid)['uid']
+
+        if chat_owner != chat_owner_uid:
+            return jsonify(msg="Not owner of chat")
+
+        self.chatDAO.insert_member(cid, user_to_add)
+        return jsonify(msg="Success")
 
     def remove_contact_from_chat_group(self, contact_id):
         chat = {
@@ -74,23 +80,21 @@ class ChatHandler:
         }
         return chat
 
-    def reply_chat_message(self, chat_id, message_id, message):
-        replies = [
-            {
-                'mid': 10
-            }
-        ]
-        message = {
-            'message_id': 5,
-            'message': 'message',
-            'cid': 1,
-            'contact_id': 1,
-            'likes': [],
-            'dislikes': [],
-            'img': None,
-            'replies': replies
-        }
-        return message
+    def reply_chat_message(self, data, mid):
+        try:
+            message = data['message']
+        except KeyError:
+            return jsonify(msg='Missing parameter')
+        if 'img' in data:
+            img = data['img']
+        else:
+            img = None
+        username = get_jwt_identity()
+        uid = self.userDAO.get_user_by_username(username)
+
+        rid = self.messageDAO.insert_reply(message, uid, mid, img)
+        message = self.messageDAO.get_message(mid)
+        return rid
 
     def get_chat_members(self, cid):
         return self.chatDAO.get_members_from_chat(cid)

@@ -77,11 +77,11 @@ class MessageDAO(DAO):
         cursor.execute(query, (mid,))
         return cursor.fetchall()
 
-    def like_message(self, mid):
-        pass
-
-    def dislike_message(self, mid):
-        pass
+    def vote_message(self, mid, uid, upvote):
+        cursor = self.get_cursor()
+        query = 'insert into vote (mid, uid, upvote) values (%s, %s, %s)'
+        cursor.execute(query, (mid, uid, upvote, ))
+        self.conn.commit()
 
     def get_num_messages_daily(self, date):
         cursor = self.get_cursor()
@@ -125,17 +125,16 @@ class MessageDAO(DAO):
         count = cursor.fetchall()
         return count[0]['num']
 
-    def get_trending_hashtags_day(self, date):
+    def get_trending_hashtags(self):
         cursor = self.get_cursor()
-        end_date = date + relativedelta(days=1)
         query = "with trending as (select count(*) as num, hid from hashtags_messages natural inner join messages " \
-                "natural inner join hashtags where messages.created_on > %s and messages.created_on < %s " \
+                "natural inner join hashtags " \
                 "group by hid order by num desc limit 10)" \
                 "select hashtag from hashtags natural inner join trending"
-        cursor.execute(query, (date, end_date))
+        cursor.execute(query)
         return cursor.fetchall()
 
-    def insert_message(self, cid, uid, message, img):
+    def insert_message(self, cid, uid, message, img=None):
         cursor = self.get_cursor()
         query = 'INSERT INTO messages (cid, uid, message) VALUES(%s, %s, %s) RETURNING mid'
         cursor.execute(query, (cid, uid, message))
@@ -146,3 +145,18 @@ class MessageDAO(DAO):
         cursor.connection.commit()
 
         return message_id
+
+    def insert_reply(self, message, uid, mid, img=None):
+        cursor = self.get_cursor()
+        message_to_reply = self.get_message(mid)
+        cid = message_to_reply['cid']
+        if img:
+            rid = self.insert_message(cid, uid, message, img=img)
+        else:
+            rid = self.insert_message(cid, uid, message)
+        query = 'INSERT INTO replies (replied_to, reply) values (%s, %s)'
+        cursor.execute(query, (message_to_reply, rid))
+        reply_id = cursor.fetchone()['mid']
+        self.conn.commit()
+        return reply_id
+

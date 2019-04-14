@@ -3,6 +3,7 @@ import datetime
 import bcrypt
 from dateutil.relativedelta import relativedelta
 from flask import jsonify
+from flask_jwt_extended import get_jwt_identity
 
 from DAO.UserDAO import UserDAO
 
@@ -29,12 +30,23 @@ class UserHandler:
     def get_contacts(self, user_id):
         return self.dao.get_contacts(user_id)
 
-    def insert_contact(self, first_name, last_name, email=None, phone=None):
-        contact = {
-            'contact_id': 3,
-            'uid': 4
-        }
-        return contact
+    def insert_contact(self, data):
+        owner_username = get_jwt_identity()
+        owner_user = self.dao.get_user_by_username(owner_username)['uid']
+        try:
+            first_name = data['first_name']
+            last_name = data['last_name']
+        except KeyError:
+            return jsonify(msg='Missing parameters')
+
+        if 'phone_number' in data:
+            contact_to_add = self.dao.get_user_by_phone_number(data['phone_number'])['uid']
+        elif 'email' in data:
+            contact_to_add = self.dao.get_user_by_email(data['email'])['uid']
+        else:
+            return jsonify(msg='Missing parameters')
+        self.dao.insert_contact(owner_user, contact_to_add, first_name, last_name)
+        return jsonify(msg="Success")
 
     def update_contact(self, contact_id):
         contact = {
@@ -43,20 +55,23 @@ class UserHandler:
         }
         return contact
 
-    def insert_user(self, username, email, password):
+    def insert_user(self, username, password, first_name, last_name, email, phone_number):
         """
         Should add user to database
+        :param phone_number:
+        :param last_name:
+        :param first_name:
         :param username: unique username
         :param email: email of user
-        :param password: hashed password
+        :param password: password that will be hashed
         :return: user id from database
         """
-        # token = self.encode_auth_token(10)
-        return 10
+        uid = self.dao.insert_user(username, password, first_name, last_name, email, phone_number)
+        return uid
 
     def verify_password(self, username, password):
         user = self.userDAO.get_user_by_username(username)
-        is_authenticated = bcrypt.checkpw(self.password.encode('utf-8'), user[0]['password'].encode('utf-8'))
+        is_authenticated = bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8'))
         return user, is_authenticated
 
     def update_user_username(self, username, new_username):
