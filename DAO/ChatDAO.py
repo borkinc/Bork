@@ -67,5 +67,5 @@ class ChatDAO(DAO):
     def insert_member(self, cid, member_to_add):
         cursor = self.get_cursor()
         query = "insert into chat_members (cid, uid) values (%s, %s)"
-        cursor.execute(query, (cid, member_to_add, cid, ))
+        cursor.execute(query, (cid, member_to_add, ))
         self.conn.commit()
