@@ -310,6 +310,7 @@ class ReplyChatMessage(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('message', help=HELP_TEXT, required=True)
         parser.add_argument('img')
+        parser.add_argument('cid')
         data = parser.parse_args()
         message = ChatHandler().reply_chat_message(data, mid)
         return jsonify(message=message)

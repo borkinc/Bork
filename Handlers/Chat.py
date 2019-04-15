@@ -83,6 +83,7 @@ class ChatHandler:
     def reply_chat_message(self, data, mid):
         try:
             message = data['message']
+            cid = data['cid']
         except KeyError:
             return jsonify(msg='Missing parameter')
         if 'img' in data:
@@ -92,8 +93,7 @@ class ChatHandler:
         username = get_jwt_identity()
         uid = self.userDAO.get_user_by_username(username)
 
-        rid = self.messageDAO.insert_reply(message, uid, mid, img)
-        message = self.messageDAO.get_message(mid)
+        rid = self.messageDAO.insert_reply(message, uid, mid, cid, img=img)
         return rid
 
     def get_chat_members(self, cid):
