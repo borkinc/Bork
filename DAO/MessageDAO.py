@@ -154,10 +154,7 @@ class MessageDAO(DAO):
 
     def insert_reply(self, message, uid, mid, cid, img=None):
         cursor = self.get_cursor()
-        if img:
-            rid = self.insert_message(cid, uid, message, img=img)
-        else:
-            rid = self.insert_message(cid, uid, message)
+        rid = self.insert_message(cid, uid, message, img=img)
         query = 'INSERT INTO replies (replied_to, reply) values (%s, %s)'
         cursor.execute(query, (mid, rid))
         reply_id = cursor.fetchone()['mid']
