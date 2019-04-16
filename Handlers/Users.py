@@ -39,9 +39,9 @@ class UserHandler:
         except KeyError:
             return jsonify(msg='Missing parameters')
         try:
-            if 'phone_number' in data:
+            if data['phone_number']:
                 contact_to_add = self.dao.get_user_by_phone_number(data['phone_number'])['uid']
-            elif 'email' in data:
+            elif data['email']:
                 contact_to_add = self.dao.get_user_by_email(data['email'])['uid']
             else:
                 return jsonify(msg='Missing parameters')
