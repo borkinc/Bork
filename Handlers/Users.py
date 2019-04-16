@@ -40,7 +40,7 @@ class UserHandler:
             return jsonify(msg='Missing parameters')
         try:
             if 'phone' in data:
-                contact_to_add = self.dao.get_user_by_phone_number(data['phone_number'])['uid']
+                contact_to_add = self.dao.get_user_by_phone_number(data['phone'])['uid']
             elif 'email' in data:
                 contact_to_add = self.dao.get_user_by_email(data['email'])['uid']
             else:
