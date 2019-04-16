@@ -142,7 +142,7 @@ class Contacts(Resource):
         parser.add_argument('first_name', help=HELP_TEXT, required=True)
         parser.add_argument('last_name', help=HELP_TEXT, required=True)
         parser.add_argument('email', help=HELP_TEXT)
-        parser.add_argument('phone', help=HELP_TEXT)
+        parser.add_argument('phone_number', help=HELP_TEXT)
         data = parser.parse_args()
         return self.handler.insert_contact(data)
 

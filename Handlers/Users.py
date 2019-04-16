@@ -39,8 +39,8 @@ class UserHandler:
         except KeyError:
             return jsonify(msg='Missing parameters')
         try:
-            if 'phone' in data:
-                contact_to_add = self.dao.get_user_by_phone_number(data['phone'])['uid']
+            if 'phone_number' in data:
+                contact_to_add = self.dao.get_user_by_phone_number(data['phone_number'])['uid']
             elif 'email' in data:
                 contact_to_add = self.dao.get_user_by_email(data['email'])['uid']
             else:
@@ -48,7 +48,7 @@ class UserHandler:
         except IndexError:
             return jsonify(msg='User does not exist')
         self.dao.insert_contact(owner_user, contact_to_add, first_name, last_name)
-        return jsonify(msg="Success")
+        return jsonify(msg="Added contact successfully")
 
     def update_contact(self, contact_id):
         contact = {
