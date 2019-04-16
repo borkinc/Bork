@@ -10,7 +10,7 @@ class UserDAO(DAO):
         query = 'insert into users (username, password, first_name, last_name, email, phone_number) ' \
                 'values (%s,%s,%s,%s,%s,%s) returning uid'
         cursor.execute(query, (username, password, first_name, last_name, email, phone_number,))
-        uid = cursor.fetchone()[0]
+        uid = cursor.fetchone()['uid']
         self.conn.commit()
         return uid
 
@@ -41,11 +41,27 @@ class UserDAO(DAO):
 
     def get_user_by_username(self, username):
         cursor = self.get_cursor()
-        query = 'SELECT username, first_name, last_name, email, phone_number ' \
+        query = 'SELECT uid, username, first_name, last_name, email, phone_number ' \
                 'FROM users ' \
                 'WHERE username = %s'
         cursor.execute(query, (username,))
-        return cursor.fetchall()
+        return cursor.fetchall()[0]
+
+    def get_user_by_phone_number(self, phone_number):
+        cursor = self.get_cursor()
+        query = 'SELECT uid, username, first_name, last_name, email, phone_number ' \
+                'FROM users ' \
+                'WHERE phone_number = %s'
+        cursor.execute(query, (phone_number, ))
+        return cursor.fetchall()[0]
+
+    def get_user_by_email(self, email):
+        cursor = self.get_cursor()
+        query = 'SELECT uid, username, first_name, last_name, email, phone_number ' \
+                'FROM users ' \
+                'WHERE email = %s'
+        cursor.execute(query, (email,))
+        return cursor.fetchall()[0]
 
     def get_daily_messages_user(self, date, uid):
         cursor = self.get_cursor()
@@ -62,3 +78,11 @@ class UserDAO(DAO):
         cursor.execute(query, (date, end_date))
         users = cursor.fetchall()
         return users
+
+    def insert_contact(self, owner_contact, contact_uid_to_add, first_name, last_name):
+        cursor = self.get_cursor()
+        query = "insert into contacts (owner_id, contact_id, first_name, last_name) values (%s, %s, %s, %s)"
+        cursor.execute(query, (owner_contact, contact_uid_to_add, first_name, last_name, ))
+        self.conn.commit()
+
+

@@ -11,13 +11,16 @@ class MessageDAO(DAO):
         :return: RealDictCursor
         """
         cursor = self.get_cursor()
-        query = 'WITH like_count AS (SELECT mid, COUNT(*) AS likes FROM vote WHERE upvote = TRUE GROUP BY mid), ' \
+        query = 'WITH replies_query as (SELECT replied_to, array_agg(mid) AS replies_list ' \
+                'FROM replies INNER JOIN messages on replies.reply =  messages.mid GROUP BY replied_to), ' \
+                'like_count AS (SELECT mid, COUNT(*) AS likes FROM vote WHERE upvote = TRUE GROUP BY mid), ' \
                 'dislike_count AS (SELECT mid, COUNT(*) as dislikes FROM vote WHERE upvote = FALSE GROUP BY mid) ' \
                 'SELECT messages.mid, users.uid, cid, message, image, COALESCE(likes, 0) as likes, ' \
-                'COALESCE(dislikes, 0) as dislikes, username, ' \
+                "COALESCE(dislikes, 0) as dislikes, username, COALESCE(replies_list, '{}') as replies, " \
                 'messages.created_on FROM messages LEFT OUTER JOIN like_count ON messages.mid = like_count.mid ' \
                 'LEFT OUTER JOIN dislike_count ON messages.mid = dislike_count.mid ' \
                 'LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid ' \
+                'LEFT OUTER JOIN replies_query ON messages.mid = replies_query.replied_to ' \
                 'ORDER BY messages.created_on DESC'
         cursor.execute(query)
         messages = cursor.fetchall()
@@ -31,12 +34,15 @@ class MessageDAO(DAO):
         """
         cursor = self.get_cursor()
         query = 'WITH like_count AS (SELECT mid, COUNT(*) AS likes FROM vote WHERE upvote = TRUE GROUP BY mid), ' \
-                'dislike_count AS (SELECT mid, COUNT(*) as dislikes FROM vote WHERE upvote = FALSE GROUP BY mid) ' \
+                'dislike_count AS (SELECT mid, COUNT(*) as dislikes FROM vote WHERE upvote = FALSE GROUP BY mid),' \
+                'replies_query as (SELECT replied_to, array_agg(mid) AS replies_list ' \
+                'FROM replies INNER JOIN messages on replies.reply =  messages.mid GROUP BY replied_to) ' \
                 'SELECT messages.mid, cid, message, image, COALESCE(likes, 0) as likes, COALESCE(dislikes, 0) ' \
-                'as dislikes, username, ' \
+                "as dislikes, username, COALESCE(replies_list, '{}') as replies " \
                 'messages.created_on FROM messages LEFT OUTER JOIN like_count ON messages.mid = like_count.mid ' \
                 'LEFT OUTER JOIN dislike_count ON messages.mid = dislike_count.mid ' \
                 'LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid ' \
+                'LEFT OUTER JOIN replies_query ON messages.mid = replies_query.replied_to ' \
                 'WHERE messages.mid = %s ORDER BY messages.created_on DESC'
         cursor.execute(query, (mid,))
         messages = cursor.fetchall()
@@ -77,11 +83,11 @@ class MessageDAO(DAO):
         cursor.execute(query, (mid,))
         return cursor.fetchall()
 
-    def like_message(self, mid):
-        pass
-
-    def dislike_message(self, mid):
-        pass
+    def vote_message(self, mid, uid, upvote):
+        cursor = self.get_cursor()
+        query = 'insert into vote (mid, uid, upvote) values (%s, %s, %s)'
+        cursor.execute(query, (mid, uid, upvote, ))
+        self.conn.commit()
 
     def get_num_messages_daily(self, date):
         cursor = self.get_cursor()
@@ -125,17 +131,16 @@ class MessageDAO(DAO):
         count = cursor.fetchall()
         return count[0]['num']
 
-    def get_trending_hashtags_day(self, date):
+    def get_trending_hashtags(self):
         cursor = self.get_cursor()
-        end_date = date + relativedelta(days=1)
         query = "with trending as (select count(*) as num, hid from hashtags_messages natural inner join messages " \
-                "natural inner join hashtags where messages.created_on > %s and messages.created_on < %s " \
+                "natural inner join hashtags " \
                 "group by hid order by num desc limit 10)" \
                 "select hashtag from hashtags natural inner join trending"
-        cursor.execute(query, (date, end_date))
+        cursor.execute(query)
         return cursor.fetchall()
 
-    def insert_message(self, cid, uid, message, img):
+    def insert_message(self, cid, uid, message, img=None):
         cursor = self.get_cursor()
         query = 'INSERT INTO messages (cid, uid, message) VALUES(%s, %s, %s) RETURNING mid'
         cursor.execute(query, (cid, uid, message))
@@ -146,3 +151,13 @@ class MessageDAO(DAO):
         cursor.connection.commit()
 
         return message_id
+
+    def insert_reply(self, message, uid, mid, cid, img=None):
+        cursor = self.get_cursor()
+        rid = self.insert_message(cid, uid, message, img=img)
+        query = 'INSERT INTO replies (replied_to, reply) values (%s, %s)'
+        cursor.execute(query, (mid, rid))
+        reply_id = cursor.fetchone()['mid']
+        self.conn.commit()
+        return reply_id
+
