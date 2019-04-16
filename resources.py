@@ -154,13 +154,12 @@ class Contacts(Resource):
         contact = self.handler.update_contact(1)
         return jsonify(contact=contact)
 
-    # @jwt_required
+    @jwt_required
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('contact_id', help=HELP_TEXT, required=True)
         data = parser.parse_args()
-        contact = self.handler.remove_contact(1)
-        return jsonify(contact=contact)
+        return self.handler.remove_contact(data)
 
 
 class Contact(Resource):

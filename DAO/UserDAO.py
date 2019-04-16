@@ -34,7 +34,7 @@ class UserDAO(DAO):
         :return: RealDictCursor
         """
         cursor = self.get_cursor()
-        query = 'SELECT username, first_name, last_name ' \
+        query = 'SELECT uid, contacts.first_name, contacts.last_name ' \
                 'FROM users INNER JOIN contacts ON contacts.owner_id = %s AND users.uid = contacts.contact_id'
         cursor.execute(query, (uid,))
         return cursor.fetchall()
@@ -83,6 +83,12 @@ class UserDAO(DAO):
         cursor = self.get_cursor()
         query = "insert into contacts (owner_id, contact_id, first_name, last_name) values (%s, %s, %s, %s)"
         cursor.execute(query, (owner_contact, contact_uid_to_add, first_name, last_name, ))
+        self.conn.commit()
+
+    def delete_contact(self, owner_id, contact_id):
+        cursor = self.get_cursor()
+        query = "delete from contacts where owner_id = %s and contact_id = %s"
+        cursor.execute(query, (owner_id, contact_id ))
         self.conn.commit()
 
 
