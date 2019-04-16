@@ -3,7 +3,7 @@ import datetime
 import bcrypt
 from dateutil.relativedelta import relativedelta
 from flask import jsonify
-from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import get_jwt_identity, create_access_token, create_refresh_token
 
 from DAO.UserDAO import UserDAO
 
@@ -57,19 +57,25 @@ class UserHandler:
         }
         return contact
 
-    def insert_user(self, username, password, first_name, last_name, email, phone_number):
-        """
-        Should add user to database
-        :param phone_number:
-        :param last_name:
-        :param first_name:
-        :param username: unique username
-        :param email: email of user
-        :param password: password that will be hashed
-        :return: user id from database
-        """
+    def insert_user(self, data):
+
+        username = data['username']
+        email = data['email']
+        password = data['password']
+        first_name = data['first_name']
+        last_name = data['last_name']
+        phone_number = data['phone_number']
+
+        access_token = create_access_token(identity=username)
+        refresh_token = create_refresh_token(identity=username, expires_delta=datetime.timedelta(days=365))
         uid = self.dao.insert_user(username, password, first_name, last_name, email, phone_number)
-        return uid
+        user = {
+            'uid': uid,
+            'username': username,
+            'access_token': access_token,
+            'refresh_token': refresh_token
+        }
+        return jsonify(user=user)
 
     def verify_password(self, username, password):
         user = self.userDAO.get_user_by_username(username)

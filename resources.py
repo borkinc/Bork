@@ -36,24 +36,7 @@ class UserRegistration(Resource):
         parser.add_argument('phone_number', help=HELP_TEXT, required=True)
 
         data = parser.parse_args()
-
-        username = data['username']
-        email = data['email']
-        password = data['password']
-        first_name = data['first_name']
-        last_name = data['last_name']
-        phone_number = data['phone_number']
-
-        uid = self.handler.insert_user(username, password, first_name, last_name, email, phone_number)
-        access_token = create_access_token(identity=username)
-        refresh_token = create_refresh_token(identity=username, expires_delta=datetime.timedelta(days=365))
-        user = {
-            'uid': uid,
-            'username': username,
-            'access_token': access_token,
-            'refresh_token': refresh_token
-        }
-        return jsonify(user=user)
+        return self.handler.insert_user(data)
 
 
 class UserLogin(Resource):
