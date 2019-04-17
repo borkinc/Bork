@@ -1,7 +1,5 @@
-import datetime
-
-from flask import jsonify, request, current_app as app, json
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
+from flask import jsonify, request, current_app as app
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_restful import Resource, reqparse
 
 from Handlers.Chat import ChatHandler
@@ -39,7 +37,8 @@ class UserRegistration(Resource):
 
         # Verifies required arguments are in request and extracts data into a dictionary
         data = parser.parse_args()
-        return self.handler.insert_user(data)
+        response, status = self.handler.insert_user(data)
+        return app.response_class(response=response, status=status, mimetype='application/json')
 
 
 class UserLogin(Resource):
@@ -53,35 +52,11 @@ class UserLogin(Resource):
         parser.add_argument('username', help=HELP_TEXT, required=True)
         parser.add_argument('password', help=HELP_TEXT, required=True)
 
-        # Verifies needed parameters to register users are present
+        # Extracts data from request and verifies required data is available
         data = parser.parse_args()
 
-        if data['username'] and data['password']:
-            user, is_authenticated = UserHandler().verify_password(data['username'], data['password'])
-            if is_authenticated:
-                access_token = create_access_token(identity=user['username'],
-                                                   expires_delta=datetime.timedelta(days=365))
-                refresh_token = create_refresh_token(identity=user['username'])
-                user = {
-                    'uid': user['uid'],
-                    'username': user['username'],
-                    'access_token': access_token,
-                    'refresh_token': refresh_token
-                }
-                response_data = {
-                    'user': user,
-                    'is_authenticated': is_authenticated
-                }
-                response = app.response_class(response=json.dumps(response_data), status=200,
-                                              mimetype='application/json')
-            else:
-                response = app.response_class(response=json.dumps({'message': 'Invalid credentials'}), status=400,
-                                              mimetype='application/json')
-        else:
-            response = app.response_class(
-                response=json.dumps({'message': 'Username and password fields cannot be blank'}),
-                status=400, mimetype='application/json')
-        return response
+        response, status = UserHandler().verify_password(data)
+        return app.response_class(response=response, status=status, mimetype='application/json')
 
 
 class Users(Resource):
@@ -123,7 +98,7 @@ class Chats(Resource):
     def __init__(self):
         self.handler = ChatHandler()
 
-    # @jwt_required
+    @jwt_required
     def get(self):
         chats = ChatHandler().get_chats()
         return jsonify(chats=chats)
@@ -135,7 +110,7 @@ class Chats(Resource):
         data = parser.parse_args()
         return self.handler.insert_chat(data)
 
-    # @jwt_required
+    @jwt_required
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('cid')

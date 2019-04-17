@@ -2,7 +2,7 @@ import datetime
 
 import bcrypt
 from dateutil.relativedelta import relativedelta
-from flask import jsonify
+from flask import jsonify, json
 from flask_jwt_extended import get_jwt_identity, create_access_token, create_refresh_token
 
 from DAO.UserDAO import UserDAO
@@ -65,30 +65,72 @@ class UserHandler:
         :param data: dict
         :return: JSON
         """
-        username = data['username']
-        email = data['email']
-        password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        first_name = data['first_name']
-        last_name = data['last_name']
-        phone_number = data['phone_number']
 
-        # Generates JWT access and refresh tokens for user.
-        access_token = create_access_token(identity=username)
-        refresh_token = create_refresh_token(identity=username, expires_delta=datetime.timedelta(days=365))
+        if data['username'] and data['username'] and data['username'] and data['username'] and data['username'] \
+                and data['username']:
+            username = data['username']
+            email = data['email']
+            password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            first_name = data['first_name']
+            last_name = data['last_name']
+            phone_number = data['phone_number']
 
-        uid = self.dao.insert_user(username, password, first_name, last_name, email, phone_number)
-        user = {
-            'uid': uid,
-            'username': username,
-            'access_token': access_token,
-            'refresh_token': refresh_token
-        }
-        return jsonify(user=user)
+            # Generates JWT access and refresh tokens for user.
+            access_token = create_access_token(identity=username)
+            refresh_token = create_refresh_token(identity=username, expires_delta=datetime.timedelta(days=365))
 
-    def verify_password(self, username, password):
-        user = self.dao.get_user_by_username(username)
-        is_authenticated = bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')) if user else False
-        return user, is_authenticated
+            uid = self.dao.insert_user(username, password, first_name, last_name, email, phone_number)
+            user = {
+                'user': {
+                    'uid': uid,
+                    'username': username,
+                    'access_token': access_token,
+                    'refresh_token': refresh_token
+                }
+            }
+            response_data = json.dumps(user)
+            response_status = 200
+        else:
+            response_data = json.dumps({'message': 'All fields must be filled'})
+            response_status = 400
+        return response_data, response_status
+
+    def verify_password(self, data):
+        """
+        Verifies user credentials
+        :param data: dict
+        :return: tuple
+        """
+        if data['username'] and data['password']:
+            username = data['username']
+            password = data['password']
+            user = self.dao.get_user_by_username(username)
+            is_authenticated = bcrypt.checkpw(password.encode('utf-8'),
+                                              user['password'].encode('utf-8')) if user else False
+            if is_authenticated:
+                access_token = create_access_token(identity=user['username'],
+                                                   expires_delta=datetime.timedelta(days=365))
+                refresh_token = create_refresh_token(identity=user['username'])
+                user = {
+                    'uid': user['uid'],
+                    'username': user['username'],
+                    'access_token': access_token,
+                    'refresh_token': refresh_token
+                }
+                response_data = json.dumps(
+                    {
+                        'user': user,
+                        'is_authenticated': is_authenticated
+                    }
+                )
+                response_status = 200
+            else:
+                response_data = json.dumps({'message': 'Invalid credentials'})
+                response_status = 400
+        else:
+            response_data = json.dumps({'message': 'Username and password fields cannot be blank'})
+            response_status = 400
+        return response_data, response_status
 
     def update_user_username(self, username, new_username):
         user = self.get_user_by_username(username)
@@ -120,4 +162,3 @@ class UserHandler:
             num = self.dao.get_daily_messages_user(uid, day_to_get)
             num_messages.append({'%s' % day_to_get: num})
         return jsonify(result=num_messages)
-
