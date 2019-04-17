@@ -60,16 +60,22 @@ class UserHandler:
         return contact
 
     def insert_user(self, data):
-
+        """
+        Handles user data to be sent to the DAO for further actions
+        :param data: dict
+        :return: JSON
+        """
         username = data['username']
         email = data['email']
-        password = data['password']
+        password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         first_name = data['first_name']
         last_name = data['last_name']
         phone_number = data['phone_number']
 
+        # Generates JWT access and refresh tokens for user.
         access_token = create_access_token(identity=username)
         refresh_token = create_refresh_token(identity=username, expires_delta=datetime.timedelta(days=365))
+
         uid = self.dao.insert_user(username, password, first_name, last_name, email, phone_number)
         user = {
             'uid': uid,
@@ -80,12 +86,12 @@ class UserHandler:
         return jsonify(user=user)
 
     def verify_password(self, username, password):
-        user = self.userDAO.get_user_by_username(username)
-        is_authenticated = bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8'))
+        user = self.dao.get_user_by_username(username)
+        is_authenticated = bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')) if user else False
         return user, is_authenticated
 
     def update_user_username(self, username, new_username):
-        user = self.get_user(username)
+        user = self.get_user_by_username(username)
         user['username'] = new_username
         return user
 

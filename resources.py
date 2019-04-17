@@ -1,6 +1,6 @@
 import datetime
 
-from flask import jsonify, request
+from flask import jsonify, request, current_app as app, json
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 from flask_restful import Resource, reqparse
 
@@ -24,9 +24,11 @@ class UserRegistration(Resource):
 
     def post(self):
         """
-        Registers new user
+        Registers user to application.
         :return: JSON
         """
+
+        # Arguments to be extracted from request
         parser = reqparse.RequestParser()
         parser.add_argument('username', help=HELP_TEXT, required=True)
         parser.add_argument('email', help=HELP_TEXT, required=True)
@@ -35,6 +37,7 @@ class UserRegistration(Resource):
         parser.add_argument('last_name', help=HELP_TEXT, required=True)
         parser.add_argument('phone_number', help=HELP_TEXT, required=True)
 
+        # Verifies required arguments are in request and extracts data into a dictionary
         data = parser.parse_args()
         return self.handler.insert_user(data)
 
@@ -52,23 +55,33 @@ class UserLogin(Resource):
 
         # Verifies needed parameters to register users are present
         data = parser.parse_args()
-        user, is_authenticated = UserHandler().verify_password(data['username'], data['password'])
-        if is_authenticated:
 
-            # TODO: Remove expires_delta after Phase I
-            access_token = create_access_token(identity=user['username'], expires_delta=datetime.timedelta(days=365))
-            refresh_token = create_refresh_token(identity=user['username'])
-            user = {
-                'uid': user['uid'],
-                'username': user['username'],
-                'access_token': access_token,
-                'refresh_token': refresh_token
-            }
+        if data['username'] and data['password']:
+            user, is_authenticated = UserHandler().verify_password(data['username'], data['password'])
+            if is_authenticated:
+                access_token = create_access_token(identity=user['username'],
+                                                   expires_delta=datetime.timedelta(days=365))
+                refresh_token = create_refresh_token(identity=user['username'])
+                user = {
+                    'uid': user['uid'],
+                    'username': user['username'],
+                    'access_token': access_token,
+                    'refresh_token': refresh_token
+                }
+                response_data = {
+                    'user': user,
+                    'is_authenticated': is_authenticated
+                }
+                response = app.response_class(response=json.dumps(response_data), status=200,
+                                              mimetype='application/json')
+            else:
+                response = app.response_class(response=json.dumps({'message': 'Invalid credentials'}), status=400,
+                                              mimetype='application/json')
         else:
-            user = {
-                'msg': 'Invalid credentials'
-            }
-        return jsonify(user=user, is_authenticated=is_authenticated)
+            response = app.response_class(
+                response=json.dumps({'message': 'Username and password fields cannot be blank'}),
+                status=400, mimetype='application/json')
+        return response
 
 
 class Users(Resource):
