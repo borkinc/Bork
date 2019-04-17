@@ -6,7 +6,7 @@ CREATE TABLE Users (
                        email        varchar(100) UNIQUE NOT NULL,
                        first_name   varchar(30)         NOT NULL,
                        last_name    varchar(30)         NOT NULL,
-                       phone_number varchar(10)         NOT NULL
+                       phone_number varchar(10)  UNIQUE NOT NULL
 );
 
 CREATE TABLE Chat_Group (
