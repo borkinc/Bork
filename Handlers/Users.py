@@ -36,19 +36,21 @@ class UserHandler:
         try:
             first_name = data['first_name']
             last_name = data['last_name']
+            phone_number = data['phone_number']
+            email = data['email']
         except KeyError:
             return jsonify(msg='Missing parameters')
         try:
-            if 'phone' in data:
+            if phone_number:
                 contact_to_add = self.dao.get_user_by_phone_number(data['phone_number'])['uid']
-            elif 'email' in data:
+            elif email:
                 contact_to_add = self.dao.get_user_by_email(data['email'])['uid']
             else:
                 return jsonify(msg='Missing parameters')
         except IndexError:
             return jsonify(msg='User does not exist')
         self.dao.insert_contact(owner_user, contact_to_add, first_name, last_name)
-        return jsonify(msg="Success")
+        return jsonify(msg="Added contact successfully")
 
     def update_contact(self, contact_id):
         contact = {
@@ -87,12 +89,13 @@ class UserHandler:
         user['username'] = new_username
         return user
 
-    def remove_contact(self, contact_id):
-        contact = {
-            'contact_id': 3,
-            'uid': 4
-        }
-        return contact
+    def remove_contact(self, data):
+        contact_id = data['contact_id']
+        username = get_jwt_identity()
+        uid = self.dao.get_user_by_username(username)['uid']
+        self.dao.delete_contact(uid, contact_id)
+        new_contacts = self.dao.get_contacts(uid)
+        return jsonify(contacts=new_contacts)
 
     def get_daily_active_users(self):
         today = datetime.datetime.today()
