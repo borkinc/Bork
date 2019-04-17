@@ -89,11 +89,12 @@ class UserHandler:
         user['username'] = new_username
         return user
 
-    def remove_contact(self, contact_id):
+    def remove_contact(self, data):
+        contact_id = data['contact_id']
         username = get_jwt_identity()
-        uid = self.dao.get_user_by_username(username)
+        uid = self.dao.get_user_by_username(username)['uid']
         self.dao.delete_contact(uid, contact_id)
-        new_contacts = self.get_contacts(uid)
+        new_contacts = self.dao.get_contacts(uid)
         return jsonify(contacts=new_contacts)
 
     def get_daily_active_users(self):

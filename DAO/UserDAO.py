@@ -88,7 +88,7 @@ class UserDAO(DAO):
     def delete_contact(self, owner_id, contact_id):
         cursor = self.get_cursor()
         query = "delete from contacts where owner_id = %s and contact_id = %s"
-        cursor.execute(query, (owner_id, contact_id ))
+        cursor.execute(query, (owner_id, contact_id, ))
         self.conn.commit()
 
 
