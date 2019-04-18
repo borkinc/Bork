@@ -104,9 +104,10 @@ class UserHandler:
         if data['username'] and data['password']:
             username = data['username']
             password = data['password']
+            db_password = self.dao.get_user_password(username)
             user = self.dao.get_user_by_username(username)
             is_authenticated = bcrypt.checkpw(password.encode('utf-8'),
-                                              user['password'].encode('utf-8')) if user else False
+                                              db_password.encode('utf-8')) if db_password else False
             if is_authenticated:
                 access_token = create_access_token(identity=user['username'],
                                                    expires_delta=datetime.timedelta(days=365))

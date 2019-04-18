@@ -46,7 +46,7 @@ class UserDAO(DAO):
         :return: RealDictCursor
         """
         cursor = self.get_cursor()
-        query = 'SELECT * ' \
+        query = 'SELECT uid, username, first_name, last_name, email, phone_number ' \
                 'FROM users ' \
                 'WHERE username = %s'
         cursor.execute(query, (username,))
@@ -96,4 +96,10 @@ class UserDAO(DAO):
         cursor.execute(query, (owner_id, contact_id, ))
         self.conn.commit()
 
-
+    def get_user_password(self, username):
+        cursor = self.get_cursor()
+        query = 'SELECT password ' \
+                'FROM users ' \
+                'WHERE username = %s'
+        cursor.execute(query, (username,))
+        return cursor.fetchone()['password']
