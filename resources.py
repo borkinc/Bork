@@ -100,15 +100,16 @@ class Chats(Resource):
 
     @jwt_required
     def get(self):
-        chats = ChatHandler().get_chats()
-        return jsonify(chats=chats)
+        response, status = self.handler.get_chats()
+        return app.response_class(response=response, status=status, mimetype='application/json')
 
     @jwt_required
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('chat_name', help=HELP_TEXT, required=True)
         data = parser.parse_args()
-        return self.handler.insert_chat(data)
+        response, status = self.handler.insert_chat(data)
+        return app.response_class(response=response, status=status, mimetype='application/json')
 
     @jwt_required
     def delete(self):
@@ -192,7 +193,7 @@ class ChatMembers(Resource):
 
 class ChatMessages(Resource):
 
-    # @jwt_required
+    @jwt_required
     def get(self, chat_id):
         """
         Gets all messages from given chat id.

@@ -76,8 +76,8 @@ class UserHandler:
             phone_number = data['phone_number']
 
             # Generates JWT access and refresh tokens for user.
-            access_token = create_access_token(identity=username)
-            refresh_token = create_refresh_token(identity=username, expires_delta=datetime.timedelta(days=365))
+            access_token = create_access_token(identity=username, expires_delta=datetime.timedelta(days=365))
+            refresh_token = create_refresh_token(identity=username)
 
             uid = self.dao.insert_user(username, password, first_name, last_name, email, phone_number)
             user = {

@@ -57,15 +57,41 @@ class ChatDAO(DAO):
         return cursor.fetchall()
 
     def insert_chat_group(self, chat_name, owner_id):
+        """
+        Inserts a new chat group to the DB
+        :param chat_name: str
+        :param owner_id: int
+        :return: int
+        """
         cursor = self.get_cursor()
-        query = "insert into chat_group (name, owner_id) values (%s, %s) returning cid"
+        query = 'INSERT INTO chat_group (name, uid) VALUES (%s, %s) RETURNING cid'
         cursor.execute(query, (chat_name, owner_id))
-        cid = cursor.fetchone()[0]
+        cid = cursor.fetchone()['cid']
         self.conn.commit()
         return cid
 
     def insert_member(self, cid, member_to_add):
+        """
+        Inserts a new chat_member on the DB
+        :param cid: int
+        :param member_to_add: int
+        """
         cursor = self.get_cursor()
         query = "insert into chat_members (cid, uid) values (%s, %s)"
-        cursor.execute(query, (cid, member_to_add, ))
+        cursor.execute(query, (cid, member_to_add,))
         self.conn.commit()
+
+    def get_user_chats(self, uid):
+        """
+        Gets all the chats that the user is a member in and chats the the user owns from the DB
+        :param uid: int
+        :return: RealDictCursor
+        """
+        cursor = self.get_cursor()
+        query = 'WITH MyChats AS (SELECT cid, uid FROM chat_members WHERE uid = %s ' \
+                'UNION ' \
+                'SELECT cid, uid FROM chat_group WHERE uid = %s)' \
+                'SELECT chat_group.cid, chat_group.uid, chat_group.name, chat_group.created_on ' \
+                'FROM chat_group NATURAL INNER JOIN MyChats'
+        cursor.execute(query, (uid, uid))
+        return cursor.fetchall()
