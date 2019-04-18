@@ -1,6 +1,6 @@
 import uuid
 
-from flask import jsonify
+from flask import jsonify, json
 from flask_jwt_extended import get_jwt_identity
 from werkzeug.utils import secure_filename
 
@@ -17,8 +17,16 @@ class ChatHandler:
         self.userDAO = UserDAO()
 
     def get_chats(self):
-        chats = self.chatDAO.get_all_chats()
-        return chats
+        """
+        Gets all chats for current user
+        :return: tuple
+        """
+        username = get_jwt_identity()
+        user = self.userDAO.get_user_by_username(username)
+        chats = self.chatDAO.get_user_chats(user['uid'])
+        response_data = json.dumps({'chats': chats})
+        response_status = 200
+        return response_data, response_status
 
     def get_chat(self, cid):
         chat = self.chatDAO.get_chat(cid)
@@ -34,14 +42,25 @@ class ChatHandler:
         return self.chatDAO.get_owner_of_chat(cid)
 
     def insert_chat(self, data):
-        username = get_jwt_identity()
-        user = self.userDAO.get_user_by_username(username)
-        try:
-            cid = self.chatDAO.insert_chat_group(data['chat_name'], user.uid)
-            response = jsonify(chat=cid, msg='Success'), 201
-        except KeyError:
-            response = jsonify(chat='N/A', msg='Missing parameters'), 400
-        return response
+        """
+        Gathers necessary data to be sent to dao for inserting a new chat
+        :param data: dict
+        :return: tuple
+        """
+        if 'chat_name' in data and data['chat_name']:
+            chat_name = data['chat_name']
+            username = get_jwt_identity()
+            user = self.userDAO.get_user_by_username(username)
+            cid = self.chatDAO.insert_chat_group(chat_name, user['uid'])
+            response_data = json.dumps({
+                'chat': cid,
+                'msg': 'Success'
+            })
+            response_status = 201
+        else:
+            response_data = json.dumps({'message': 'Chat name cannot be blank'})
+            response_status = 400
+        return response_data, response_status
 
     def insert_chat_message(self, cid, uid, message, img=None):
         if img:
@@ -68,7 +87,7 @@ class ChatHandler:
         chat = {
             'cid': 1,
             'name': 'skiribops',
-            'participants': self.participants
+            'participants': []
         }
         return chat
 
@@ -76,7 +95,7 @@ class ChatHandler:
         chat = {
             'cid': 1,
             'name': 'skiribops',
-            'participants': self.participants
+            'participants': []
         }
         return chat
 
@@ -95,6 +114,3 @@ class ChatHandler:
 
         rid = self.messageDAO.insert_reply(message, uid, mid, cid, img=img)
         return rid
-
-    def get_chat_members(self, cid):
-        return self.chatDAO.get_members_from_chat(cid)

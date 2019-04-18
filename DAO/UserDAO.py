@@ -40,12 +40,17 @@ class UserDAO(DAO):
         return cursor.fetchall()
 
     def get_user_by_username(self, username):
+        """
+        Queries DB for information on given username
+        :param username: str
+        :return: RealDictCursor
+        """
         cursor = self.get_cursor()
         query = 'SELECT uid, username, first_name, last_name, email, phone_number ' \
                 'FROM users ' \
                 'WHERE username = %s'
         cursor.execute(query, (username,))
-        return cursor.fetchall()[0]
+        return cursor.fetchall()[0] if cursor.rowcount > 0 else None
 
     def get_user_by_phone_number(self, phone_number):
         cursor = self.get_cursor()
@@ -91,4 +96,10 @@ class UserDAO(DAO):
         cursor.execute(query, (owner_id, contact_id, ))
         self.conn.commit()
 
-
+    def get_user_password(self, username):
+        cursor = self.get_cursor()
+        query = 'SELECT password ' \
+                'FROM users ' \
+                'WHERE username = %s'
+        cursor.execute(query, (username,))
+        return cursor.fetchone()['password']
