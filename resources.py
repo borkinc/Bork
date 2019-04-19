@@ -210,10 +210,10 @@ class ChatMessages(Resource):
         parser.add_argument('message', help=HELP_TEXT, required=True)
         data = parser.parse_args()
         if 'img' in request.files and request.files['img']:
-            message = ChatHandler().insert_chat_message(cid=chat_id, uid=data['uid'], message=data['message'],
+            message = ChatHandler().insert_chat_message(cid=chat_id, username=get_jwt_identity(), message=data['message'],
                                                         img=request.files['img'])
         else:
-            message = ChatHandler().insert_chat_message(cid=chat_id, uid=data['uid'], message=data['message'])
+            message = ChatHandler().insert_chat_message(cid=chat_id, username=get_jwt_identity(), message=data['message'])
         return jsonify(message=message)
 
 
