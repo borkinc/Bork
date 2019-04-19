@@ -107,6 +107,7 @@ class Chats(Resource):
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('chat_name', help=HELP_TEXT, required=True)
+        parser.add_argument('members')
         data = parser.parse_args()
         response, status = self.handler.insert_chat(data)
         return app.response_class(response=response, status=status, mimetype='application/json')

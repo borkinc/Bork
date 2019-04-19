@@ -51,7 +51,11 @@ class ChatHandler:
             chat_name = data['chat_name']
             username = get_jwt_identity()
             user = self.userDAO.get_user_by_username(username)
-            cid = self.chatDAO.insert_chat_group(chat_name, user['uid'])
+            if data['members'] is not None:
+                members = data['members'].split(',')
+            else:
+                members = []
+            cid = self.chatDAO.insert_chat_group(chat_name, user['uid'], members=members)
             response_data = json.dumps({
                 'chat': cid,
                 'msg': 'Success'
