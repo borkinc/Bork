@@ -56,11 +56,12 @@ class ChatDAO(DAO):
         cursor.execute(query, (cid,))
         return cursor.fetchall()
 
-    def insert_chat_group(self, chat_name, owner_id):
+    def insert_chat_group(self, chat_name, owner_id, members=[]):
         """
         Inserts a new chat group to the DB
         :param chat_name: str
         :param owner_id: int
+        :param members: list containing uids of users to add
         :return: int
         """
         cursor = self.get_cursor()
@@ -68,6 +69,8 @@ class ChatDAO(DAO):
         cursor.execute(query, (chat_name, owner_id))
         cid = cursor.fetchone()['cid']
         self.conn.commit()
+        for member in members:
+            self.insert_member(cid, member)
         return cid
 
     def insert_member(self, cid, member_to_add):

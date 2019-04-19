@@ -51,7 +51,11 @@ class ChatHandler:
             chat_name = data['chat_name']
             username = get_jwt_identity()
             user = self.userDAO.get_user_by_username(username)
-            cid = self.chatDAO.insert_chat_group(chat_name, user['uid'])
+            if data['members'] is not None:
+                members = data['members'].split(',')
+            else:
+                members = []
+            cid = self.chatDAO.insert_chat_group(chat_name, user['uid'], members=members)
             response_data = json.dumps({
                 'chat': cid,
                 'msg': 'Success'
@@ -62,13 +66,14 @@ class ChatHandler:
             response_status = 400
         return response_data, response_status
 
-    def insert_chat_message(self, cid, uid, message, img=None):
+    def insert_chat_message(self, cid, username, message, img=None):
         if img:
             img.filename = f'{uuid.uuid4()}{img.filename}'
             filename = secure_filename(img.filename)
             from app import ROOT_DIR
             img.save(f'{ROOT_DIR}\\static\\img\\{filename}')
             img = f'static/img/{filename}'
+        uid = UserDAO().get_user_by_username(username)['uid']
         return self.messageDAO.insert_message(cid, uid, message, img=img)
 
     def add_contact_to_chat_group(self, cid, data):
