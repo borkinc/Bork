@@ -161,3 +161,19 @@ class MessageDAO(DAO):
         self.conn.commit()
         return reply_id
 
+    def remove_vote(self, mid, uid, upvote):
+        cursor = self.get_cursor()
+        query = "SELECT * FROM vote WHERE mid = %s and uid = %s"
+        cursor.execute(query, (mid, uid))
+        vote = [vote for vote in cursor.fetchall()]
+        delete = vote[0]['upvote'] == upvote
+
+        if delete:
+            query = "DELETE FROM vote WHERE mid = %s and uid = %s"
+            cursor.execute(query, (mid, uid))
+
+        else:
+            query = "UPDATE vote SET upvote = %s WHERE mid = %s and uid = %s"
+            cursor.execute(query, (upvote, mid, uid))
+        self.conn.commit()
+        return delete
