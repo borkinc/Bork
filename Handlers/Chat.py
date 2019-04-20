@@ -72,24 +72,34 @@ class ChatHandler:
         return self.messageDAO.insert_message(cid, uid, message, img=img)
 
     def add_contact_to_chat_group(self, cid, data):
-        chat_owner_username = get_jwt_identity()
-        chat_owner_uid = self.userDAO.get_user_by_username(chat_owner_username)['uid']
+        current_user_username = get_jwt_identity()
+        current_user_uid = self.userDAO.get_user_by_username(current_user_username)['uid']
         user_to_add = data['contact_id']
-        chat_owner = self.chatDAO.get_owner_of_chat(cid)['uid']
+        chat_owner_uid = self.chatDAO.get_owner_of_chat(cid)[0]['uid']
 
-        if chat_owner != chat_owner_uid:
-            return jsonify(msg="Not owner of chat")
+        if chat_owner_uid != current_user_uid:
+            response_data = json.dumps({'msg': 'Not owner of chat'})
+            response_status = 403
+        else:
+            self.chatDAO.insert_member(cid, user_to_add)
+            response_data = json.dumps({'msg': 'Success'})
+            response_status = 201
+        return response_data, response_status
 
-        self.chatDAO.insert_member(cid, user_to_add)
-        return jsonify(msg="Success")
+    def remove_contact_from_chat_group(self, cid, data):
+        current_user_username = get_jwt_identity()
+        current_user_uid = self.userDAO.get_user_by_username(current_user_username)['uid']
+        user_to_remove = data['contact_id']
+        chat_owner_uid = self.chatDAO.get_owner_of_chat(cid)[0]['uid']
 
-    def remove_contact_from_chat_group(self, contact_id):
-        chat = {
-            'cid': 1,
-            'name': 'skiribops',
-            'participants': []
-        }
-        return chat
+        if chat_owner_uid != current_user_uid:
+            response_data = json.dumps({'msg': 'Not owner of chat'})
+            response_status = 403
+        else:
+            self.chatDAO.remove_member(cid, user_to_remove)
+            response_data = json.dumps({'msg': 'Success'})
+            response_status = 201
+        return response_data, response_status
 
     def remove_chat(self, cid):
         chat = {

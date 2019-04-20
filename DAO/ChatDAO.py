@@ -51,8 +51,10 @@ class ChatDAO(DAO):
 
     def get_owner_of_chat(self, cid):
         cursor = self.get_cursor()
-        query = "select uid, username, first_name, last_name, email, phone_number from chat_group natural inner join " \
-                "users where cid = %s"
+        query = 'SELECT users.uid, users.username, users.first_name, users.last_name, users.email, ' \
+                'users.phone_number ' \
+                'FROM chat_group INNER JOIN users ON chat_group.uid = users.uid ' \
+                'WHERE chat_group.cid = %s'
         cursor.execute(query, (cid,))
         return cursor.fetchall()
 
@@ -92,6 +94,12 @@ class ChatDAO(DAO):
                 'UNION ' \
                 'SELECT cid, uid FROM chat_group WHERE uid = %s)' \
                 'SELECT chat_group.cid, chat_group.uid, chat_group.name, chat_group.created_on ' \
-                'FROM chat_group NATURAL INNER JOIN MyChats'
+                'FROM chat_group INNER JOIN MyChats ON chat_group.cid = MyChats.cid'
         cursor.execute(query, (uid, uid))
         return cursor.fetchall()
+
+    def remove_member(self, cid, member_to_remove):
+        cursor = self.get_cursor()
+        query = 'DELETE FROM chat_members WHERE cid = %s AND uid = %s'
+        cursor.execute(query, (cid, member_to_remove))
+        self.conn.commit()
