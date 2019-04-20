@@ -31,12 +31,32 @@ class MessageHandler:
     def like_message(self, mid):
         user = get_jwt_identity()
         uid = UserDAO().get_user_by_username(user)['uid']
-        return self.dao.vote_message(mid, uid, True)
+        try:
+            self.dao.vote_message(mid, uid, True)
+            msg = 'Successfully added vote'
+        except:
+            self.dao.conn.rollback()
+            deleted = self.dao.remove_vote(mid, uid, True)
+            if not deleted:
+                msg = 'Successfully changed vote'
+            else:
+                msg = 'Successfully removed vote'
+        return msg
 
     def dislike_message(self, mid):
         user = get_jwt_identity()
         uid = UserDAO().get_user_by_username(user)['uid']
-        return self.dao.vote_message(mid, uid, False)
+        try:
+            self.dao.vote_message(mid, uid, False)
+            msg = 'Successfully added vote'
+        except:
+            self.dao.conn.rollback()
+            deleted = self.dao.remove_vote(mid, uid, False)
+            if deleted:
+                msg = 'Successfully changed vote'
+            else:
+                msg = 'Successfully removed vote'
+        return msg
 
     def get_num_messages_daily(self):
         today = datetime.date.today()
