@@ -187,9 +187,30 @@ class Chat(Resource):
 
 class ChatMembers(Resource):
 
+    @jwt_required
     def get(self, cid):
         chat_members = ChatHandler().get_chat_members(cid)
         return jsonify(chat_members=chat_members)
+
+    @jwt_required
+    def post(self, cid):
+        parser = reqparse.RequestParser()
+        parser.add_argument('contact_id', help=HELP_TEXT, required=True)
+
+        data = parser.parse_args()
+
+        response, status = ChatHandler().add_contact_to_chat_group(cid, data)
+        return app.response_class(response=response, status=status, mimetype='application/json')
+
+    @jwt_required
+    def delete(self, cid):
+        parser = reqparse.RequestParser()
+        parser.add_argument('contact_id', help=HELP_TEXT, required=True)
+
+        data = parser.parse_args()
+
+        response, status = ChatHandler().remove_contact_from_chat_group(cid, data)
+        return app.response_class(response=response, status=status, mimetype='application/json')
 
 
 class ChatMessages(Resource):
