@@ -29,34 +29,10 @@ class MessageHandler:
         return self.dao.get_list_of_dislikers_message(mid)
 
     def like_message(self, mid):
-        user = get_jwt_identity()
-        uid = UserDAO().get_user_by_username(user)['uid']
-        try:
-            self.dao.vote_message(mid, uid, True)
-            msg = 'Successfully added vote'
-        except:
-            self.dao.conn.rollback()
-            deleted = self.dao.remove_vote(mid, uid, True)
-            if not deleted:
-                msg = 'Successfully changed vote'
-            else:
-                msg = 'Successfully removed vote'
-        return msg
+        return self._vote_message(mid, True)
 
     def dislike_message(self, mid):
-        user = get_jwt_identity()
-        uid = UserDAO().get_user_by_username(user)['uid']
-        try:
-            self.dao.vote_message(mid, uid, False)
-            msg = 'Successfully added vote'
-        except:
-            self.dao.conn.rollback()
-            deleted = self.dao.remove_vote(mid, uid, False)
-            if deleted:
-                msg = 'Successfully changed vote'
-            else:
-                msg = 'Successfully removed vote'
-        return msg
+        return self._vote_message(mid, False)
 
     def get_num_messages_daily(self):
         today = datetime.date.today()
@@ -128,3 +104,17 @@ class MessageHandler:
             trending_hashtags.append({'hashtag': hashtag['hashtag'], 'position': i + 1})
         return jsonify(trending_hashtags)
 
+    def _vote_message(self, mid, upvote):
+        user = get_jwt_identity()
+        uid = UserDAO().get_user_by_username(user)['uid']
+        try:
+            self.dao.vote_message(mid, uid, upvote)
+            msg = 'Successfully added vote'
+        except:
+            self.dao.conn.rollback()
+            deleted = self.dao.remove_vote(mid, uid, upvote)
+            if deleted:
+                msg = 'Successfully changed vote'
+            else:
+                msg = 'Successfully removed vote'
+        return msg
