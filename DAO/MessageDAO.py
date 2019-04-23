@@ -133,10 +133,8 @@ class MessageDAO(DAO):
 
     def get_trending_hashtags(self):
         cursor = self.get_cursor()
-        query = "with trending as (select count(*) as num, hid from hashtags_messages natural inner join messages " \
-                "natural inner join hashtags " \
-                "group by hid order by num desc limit 10)" \
-                "select hashtag from hashtags natural inner join trending"
+        query = "select count(*) as num, hashtag from hashtags_messages natural inner join messages " \
+                "group by hashtag order by num desc limit 10"
         cursor.execute(query)
         return cursor.fetchall()
 
@@ -148,8 +146,10 @@ class MessageDAO(DAO):
         if img:
             query = 'INSERT INTO photo (image, mid) VALUES (%s, %s)'
             cursor.execute(query, (img, message_id))
+        hastags = [mess for mess in message.split() if mess.startswith("#")]
         cursor.connection.commit()
-
+        for hashtag in hastags:
+            self.insert_hashtag(hashtag, message_id)
         return message_id
 
     def insert_reply(self, message, uid, mid, cid, img=None):
@@ -160,6 +160,12 @@ class MessageDAO(DAO):
         reply_id = cursor.fetchone()['mid']
         self.conn.commit()
         return reply_id
+
+    def insert_hashtag(self, hashtag, mid):
+        cursor = self.get_cursor()
+        query = 'INSERT INTO hashtags_messages (hashtag, mid) values (%s, %s)'
+        cursor.execute(query, (hashtag, mid))
+        self.conn.commit()
 
     def remove_vote(self, mid, uid, upvote):
         cursor = self.get_cursor()

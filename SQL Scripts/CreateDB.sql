@@ -68,15 +68,10 @@ CREATE TABLE Contacts
 
 );
 
-CREATE TABLE Hashtags
-(
-    hid     SERIAL PRIMARY KEY,
-    hashtag varchar(50) UNIQUE NOT NULL
-);
 
 CREATE TABLE Hashtags_Messages
 (
-    hid INTEGER REFERENCES Hashtags (hid),
+    hashtag VARCHAR(50),
     mid INTEGER REFERENCES Messages (mid),
     PRIMARY KEY (hid, mid)
 );
