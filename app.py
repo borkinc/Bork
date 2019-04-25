@@ -13,7 +13,7 @@ from resources import UserRegistration, TokenRefresh, UserLogin, Chats, Index, C
 app = Flask(__name__)
 config = f'config.config.{os.getenv("FLASK_SETTINGS")}'
 app.config.from_object(config)
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+cors = CORS(app, resources={r"*": {"origins": "*"}})
 api = Api(app, prefix='/api')
 jwt = JWTManager(app)
 
