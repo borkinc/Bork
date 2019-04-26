@@ -147,9 +147,9 @@ class MessageDAO(DAO):
             query = 'INSERT INTO photo (image, mid) VALUES (%s, %s)'
             cursor.execute(query, (img, message_id))
         hastags = [mess for mess in message.split() if mess.startswith("#")]
-        cursor.connection.commit()
         for hashtag in hastags:
             self.insert_hashtag(hashtag, message_id)
+        cursor.connection.commit()
         return message_id
 
     def insert_reply(self, message, uid, mid, cid, img=None):
