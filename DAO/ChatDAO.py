@@ -106,3 +106,9 @@ class ChatDAO(DAO):
         query = 'DELETE FROM chat_members WHERE cid = %s AND uid = %s'
         cursor.execute(query, (cid, member_to_remove))
         self.conn.commit()
+
+    def delete_chat(self, cid):
+        cursor = self.get_cursor()
+        query = 'DELETE FROM chat_group WHERE cid = %s'
+        cursor.execute(query, (cid, ))
+        self.conn.commit()

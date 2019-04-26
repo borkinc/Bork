@@ -178,11 +178,9 @@ class Chat(Resource):
         chat = ChatHandler().add_contact_to_chat_group(cid, data)
         return jsonify(chat=chat)
 
-    # @jwt_required
+    @jwt_required
     def delete(self, cid):
-        data = self.parser.parse_args()
-        chat = ChatHandler().remove_contact_from_chat_group(1)
-        return jsonify(chat=chat)
+        return ChatHandler().delete_chat(cid)
 
 
 class ChatMembers(Resource):
