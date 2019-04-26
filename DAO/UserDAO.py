@@ -79,7 +79,9 @@ class UserDAO(DAO):
     def get_daily_active_users(self, date):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select username from messages natural inner join users where created_on > %s and created_on < %s"
+        query = "WITH top_users AS (SELECT COUNT(*) AS amount, username FROM messages INNER JOIN users ON messages.uid = users.uid " \
+                "WHERE messages.created_on > %s AND messages.created_on < %s GROUP BY username ORDER BY amount  )" \
+                "SELECT username FROM top_users LIMIT 10 "
         cursor.execute(query, (date, end_date))
         users = cursor.fetchall()
         return users
