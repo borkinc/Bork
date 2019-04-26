@@ -132,8 +132,8 @@ class ChatHandler:
 
     def delete_chat(self, cid):
         username = get_jwt_identity()
-        uid = self.userDAO.get_user_by_username(username)
-        chat_owner = self.chatDAO.get_owner_of_chat(cid)
+        uid = self.userDAO.get_user_by_username(username)['uid']
+        chat_owner = self.chatDAO.get_owner_of_chat(cid)[0]['uid']
         if uid == chat_owner:
             self.chatDAO.delete_chat(cid)
             return jsonify(msg="Deleted")
