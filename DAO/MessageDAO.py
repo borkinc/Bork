@@ -100,7 +100,7 @@ class MessageDAO(DAO):
     def get_num_likes_daily(self, date, like):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select count(*) as num from vote where liked_on > %s and liked_on < %s and upvote = %s"
+        query = "select count(*) as num from vote where voted_on > %s and voted_on < %s and upvote = %s"
         cursor.execute(query, (date, end_date, like))
         count = cursor.fetchall()
         return count[0]['num']
