@@ -129,3 +129,13 @@ class ChatHandler:
 
         rid = self.messageDAO.insert_reply(message, uid, mid, cid, img=img)
         return rid
+
+    def delete_chat(self, cid):
+        username = get_jwt_identity()
+        uid = self.userDAO.get_user_by_username(username)['uid']
+        chat_owner = self.chatDAO.get_owner_of_chat(cid)[0]['uid']
+        if uid == chat_owner:
+            self.chatDAO.delete_chat(cid)
+            return jsonify(msg="Deleted")
+        else:
+            return jsonify(msg="Not ur chat >:(")

@@ -50,7 +50,7 @@ class MessageHandler:
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_likes_daily(day_to_get, True)
             num_likes.append({'day': day_to_get, 'total': num})
-        return jsonify(result=num_likes)
+        return jsonify(num_likes)
 
     def get_num_dislikes_daily(self):
         today = datetime.date.today()
@@ -59,7 +59,7 @@ class MessageHandler:
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_likes_daily(day_to_get, False)
             num_dislikes.append({'day': day_to_get, 'total': num})
-        return jsonify(result=num_dislikes)
+        return jsonify(num_dislikes)
 
     def get_num_replies_daily(self):
         today = datetime.date.today()
@@ -68,7 +68,7 @@ class MessageHandler:
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_replies_daily(day_to_get)
             num_replies.append({'day': day_to_get, 'total': num})
-        return jsonify(result=num_replies)
+        return jsonify(num_replies)
 
     def get_num_replies_photo(self, pid):
         today = datetime.date.today()
@@ -77,7 +77,7 @@ class MessageHandler:
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_replies_photos_daily(pid, day_to_get)
             num_replies.append({'day': day_to_get, 'total': num})
-        return jsonify(result=num_replies)
+        return jsonify(num_replies)
 
     def get_num_likes_photo(self, pid):
         today = datetime.date.today()
@@ -86,7 +86,7 @@ class MessageHandler:
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_like_photos_daily(pid, day_to_get, True)
             num_likes.append({'day': day_to_get, 'total': num})
-        return jsonify(result=num_likes)
+        return jsonify(num_likes)
 
     def get_num_dislikes_photo(self, pid):
         today = datetime.date.today()
@@ -95,7 +95,7 @@ class MessageHandler:
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_like_photos_daily(pid, day_to_get, False)
             num_likes.append({'day': day_to_get, 'total': num})
-        return jsonify(result=num_likes)
+        return jsonify(num_likes)
 
     def get_trending_hashtags(self):
         trending_hashtags = []

@@ -13,14 +13,14 @@ CREATE TABLE Users
 CREATE TABLE Chat_Group
 (
     cid        serial PRIMARY KEY,
-    uid        INTEGER REFERENCES Users (uid),
+    uid        INTEGER REFERENCES Users (uid) ON DELETE CASCADE,
     name       varchar(25) NOT NULL,
     created_on TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Chat_Members
 (
-    cid       INTEGER REFERENCES Chat_Group (cid),
+    cid       INTEGER REFERENCES Chat_Group (cid) ON DELETE CASCADE,
     uid       INTEGER REFERENCES Users (uid),
     joined_on TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (cid, uid)
@@ -29,8 +29,8 @@ CREATE TABLE Chat_Members
 CREATE TABLE Messages
 (
     mid        serial PRIMARY KEY,
-    cid        INTEGER REFERENCES Chat_Group (cid),
-    uid        INTEGER REFERENCES Users (uid),
+    cid        INTEGER REFERENCES Chat_Group (cid) ON DELETE CASCADE,
+    uid        INTEGER REFERENCES Users (uid) ON DELETE CASCADE,
     message    VARCHAR(500),
     created_on TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -39,20 +39,20 @@ CREATE TABLE Photo
 (
     pid   serial PRIMARY KEY,
     image varchar(2083) NOT NULL,
-    mid   INTEGER REFERENCES Messages (mid)
+    mid   INTEGER REFERENCES Messages (mid) ON DELETE CASCADE
 );
 
 CREATE TABLE Replies
 (
-    replied_to INTEGER REFERENCES Messages (mid),
-    reply      INTEGER REFERENCES Messages (mid),
+    replied_to INTEGER REFERENCES Messages (mid) ON DELETE CASCADE,
+    reply      INTEGER REFERENCES Messages (mid) ON DELETE CASCADE,
     PRIMARY KEY (replied_to, reply)
 );
 
 CREATE TABLE Vote
 (
-    mid      INTEGER REFERENCES Messages (mid),
-    uid      INTEGER REFERENCES Users (uid),
+    mid      INTEGER REFERENCES Messages (mid) ON DELETE CASCADE,
+    uid      INTEGER REFERENCES Users (uid) ON DELETE CASCADE,
     voted_on TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     upvote   BOOLEAN     NOT NULL,
     PRIMARY KEY (mid, uid)
@@ -60,23 +60,18 @@ CREATE TABLE Vote
 
 CREATE TABLE Contacts
 (
-    owner_id   Integer REFERENCES Users (uid),
-    contact_id Integer REFERENCES Users (uid),
+    owner_id   Integer REFERENCES Users (uid) ON DELETE CASCADE,
+    contact_id Integer REFERENCES Users (uid) ON DELETE CASCADE,
     first_name VARCHAR(30) NOT NULL,
     last_name  VARCHAR(30) NOT NULL,
     PRIMARY KEY (owner_id, contact_id)
 
 );
 
-CREATE TABLE Hashtags
-(
-    hid     SERIAL PRIMARY KEY,
-    hashtag varchar(50) UNIQUE NOT NULL
-);
 
 CREATE TABLE Hashtags_Messages
 (
-    hid INTEGER REFERENCES Hashtags (hid),
+    hashtag VARCHAR(50),
     mid INTEGER REFERENCES Messages (mid),
     PRIMARY KEY (hid, mid)
 );
