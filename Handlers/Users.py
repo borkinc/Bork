@@ -152,7 +152,7 @@ class UserHandler:
         for i in range(7):
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_daily_active_users(day_to_get)
-            users.append({'%s' % day_to_get: num})
+            users.append({'day': '%s' % day_to_get, 'users': num})
         return jsonify(users)
 
     def get_num_messages_user(self, uid):
