@@ -71,10 +71,15 @@ class UserDAO(DAO):
     def get_daily_messages_user(self, date, uid):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select count(*) as num from messages where messages.uid = %s and created_on > %s and created_on < %s"
+        query = "select count(*) as num, username from messages inner join users on users.uid = messages.uid where messages.uid = %s " \
+                "and messages.created_on > %s and messages.created_on < %s group by username"
         cursor.execute(query, (uid, date, end_date,))
-        count = cursor.fetchall()
-        return count[0]['num']
+        count = cursor.fetchone()
+        if count:
+            return count
+        else:
+            user = self.get_user(uid)[0]
+            return {'num': 0, 'username': user['username']}
 
     def get_daily_active_users(self, date):
         cursor = self.get_cursor()
