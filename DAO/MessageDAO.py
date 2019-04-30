@@ -108,7 +108,7 @@ class MessageDAO(DAO):
     def get_num_replies_daily(self, date):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select count(*) as num from replies inner join messages on messages.mid = replies.reply" \
+        query = "select count(*) as num from replies inner join messages on messages.mid = replies.replied_to" \
                 " where created_on > %s and created_on < %s"
         cursor.execute(query, (date, end_date))
         count = cursor.fetchall()
@@ -117,7 +117,7 @@ class MessageDAO(DAO):
     def get_num_replies_photos_daily(self, pid, date):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select count(*) as num from replies where replies.reply = %s and created _on > %s and created_on < %s"
+        query = "select count(*) as num from replies inner join messages on messages.mid = replies.replied_to where replies.replied_to = %s and created_on > %s and created_on < %s"
         cursor.execute(query, (pid, date, end_date, ))
         count = cursor.fetchall()
         return count[0]['num']
@@ -125,8 +125,8 @@ class MessageDAO(DAO):
     def get_num_like_photos_daily(self, pid, date, like):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select count(*) as num, vote from vote where vote.mid = %s " \
-                "and vote.upvote = %s and created_on > %s and created_on < %s"
+        query = "select count(*) as num from vote where vote.mid = %s " \
+                "and vote.upvote = %s and voted_on > %s and voted_on < %s"
         cursor.execute(query, (pid, like, date, end_date, ))
         count = cursor.fetchall()
         return count[0]['num']
