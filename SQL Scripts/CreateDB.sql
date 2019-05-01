@@ -71,8 +71,8 @@ CREATE TABLE Contacts
 
 CREATE TABLE Hashtags_Messages
 (
+    hid     SERIAL PRIMARY KEY,
     hashtag VARCHAR(50),
-    mid INTEGER REFERENCES Messages (mid),
-    PRIMARY KEY (hid, mid)
+    mid     INTEGER REFERENCES Messages (mid)
 );
 

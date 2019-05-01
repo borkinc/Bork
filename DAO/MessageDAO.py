@@ -86,7 +86,7 @@ class MessageDAO(DAO):
     def vote_message(self, mid, uid, upvote):
         cursor = self.get_cursor()
         query = 'insert into vote (mid, uid, upvote) values (%s, %s, %s)'
-        cursor.execute(query, (mid, uid, upvote, ))
+        cursor.execute(query, (mid, uid, upvote,))
         self.conn.commit()
 
     def get_num_messages_daily(self, date):
@@ -118,7 +118,7 @@ class MessageDAO(DAO):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
         query = "select count(*) as num from replies inner join messages on messages.mid = replies.replied_to where replies.replied_to = %s and created_on > %s and created_on < %s"
-        cursor.execute(query, (pid, date, end_date, ))
+        cursor.execute(query, (pid, date, end_date,))
         count = cursor.fetchall()
         return count[0]['num']
 
@@ -127,7 +127,7 @@ class MessageDAO(DAO):
         end_date = date + relativedelta(days=1)
         query = "select count(*) as num from vote where vote.mid = %s " \
                 "and vote.upvote = %s and voted_on > %s and voted_on < %s"
-        cursor.execute(query, (pid, like, date, end_date, ))
+        cursor.execute(query, (pid, like, date, end_date,))
         count = cursor.fetchall()
         return count[0]['num']
 
@@ -155,9 +155,9 @@ class MessageDAO(DAO):
     def insert_reply(self, message, uid, mid, cid, img=None):
         cursor = self.get_cursor()
         rid = self.insert_message(cid, uid, message, img=img)
-        query = 'INSERT INTO replies (replied_to, reply) values (%s, %s)'
+        query = 'INSERT INTO replies (replied_to, reply) values (%s, %s) RETURNING reply'
         cursor.execute(query, (mid, rid))
-        reply_id = cursor.fetchone()['mid']
+        reply_id = cursor.fetchone()['reply']
         self.conn.commit()
         return reply_id
 
