@@ -10,18 +10,19 @@ class ChatDAO(DAO):
         :return: RealDictCursor
         """
         cursor = self.get_cursor()
-        query = 'WITH replies_query as (SELECT replied_to, array_agg(mid) AS replies_list ' \
-                'FROM replies INNER JOIN messages on replies.reply =  messages.mid GROUP BY replied_to), ' \
-                'like_count AS (SELECT mid, COUNT(*) AS likes FROM vote WHERE upvote = TRUE GROUP BY mid), ' \
-                'dislike_count AS (SELECT mid, COUNT(*) as dislikes FROM vote WHERE upvote = FALSE GROUP BY mid) ' \
-                'SELECT messages.mid, users.uid, cid, message, image, COALESCE(likes, 0) as likes, ' \
-                "COALESCE(dislikes, 0) as dislikes, username, COALESCE(replies_list, '{}') as replies, " \
-                'messages.created_on FROM messages LEFT OUTER JOIN like_count ON messages.mid = like_count.mid ' \
-                'LEFT OUTER JOIN dislike_count ON messages.mid = dislike_count.mid ' \
-                'LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid ' \
-                'LEFT OUTER JOIN replies_query ON messages.mid = replies_query.replied_to ' \
-                'WHERE messages.cid = %s ' \
-                'ORDER BY messages.created_on DESC'
+        query = "WITH replies_query as (SELECT reply, message AS replies_list " \
+                "FROM replies INNER JOIN messages on replies.replied_to =  messages.mid GROUP BY reply, message), " \
+                "like_count AS (SELECT mid, COUNT(*) AS likes FROM vote WHERE upvote = TRUE GROUP BY mid), " \
+                "dislike_count AS (SELECT mid, COUNT(*) as dislikes FROM vote WHERE upvote = FALSE GROUP BY mid) " \
+                "SELECT messages.mid, users.uid, cid, message, image, COALESCE(likes, 0) as likes, " \
+                "COALESCE(dislikes, 0) as dislikes, username, COALESCE(replies_list, NULL) as replies, " \
+                "messages.created_on " \
+                "FROM messages LEFT OUTER JOIN like_count ON messages.mid = like_count.mid " \
+                "LEFT OUTER JOIN dislike_count ON messages.mid = dislike_count.mid " \
+                "LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid " \
+                "LEFT OUTER JOIN replies_query ON messages.mid = replies_query.reply " \
+                "WHERE messages.cid = %s " \
+                "ORDER BY messages.created_on DESC"
         cursor.execute(query, (cid,))
         messages = cursor.fetchall()
         return messages

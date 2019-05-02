@@ -300,11 +300,11 @@ class ReplyChatMessage(Resource):
     def post(self, mid):
         parser = reqparse.RequestParser()
         parser.add_argument('message', help=HELP_TEXT, required=True)
-        parser.add_argument('img')
-        parser.add_argument('cid')
+        parser.add_argument('cid', help=HELP_TEXT, required=True)
         data = parser.parse_args()
-        message = ChatHandler().reply_chat_message(data, mid)
-        return jsonify(message=message)
+        data['img'] = request.files['img'] or None
+        response, status = ChatHandler().reply_chat_message(data, mid)
+        return app.response_class(response=response, status=status, mimetype='application/json')
 
 
 class TokenRefresh(Resource):

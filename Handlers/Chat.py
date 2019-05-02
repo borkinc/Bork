@@ -9,6 +9,15 @@ from DAO.MessageDAO import MessageDAO
 from DAO.UserDAO import UserDAO
 
 
+def store_image(img):
+    img.filename = f'{uuid.uuid4()}{img.filename}'
+    filename = secure_filename(img.filename)
+    from app import ROOT_DIR
+    img.save(f'{ROOT_DIR}\\static\\img\\{filename}')
+    img = f'static/img/{filename}'
+    return img
+
+
 class ChatHandler:
 
     def __init__(self):
@@ -68,11 +77,7 @@ class ChatHandler:
 
     def insert_chat_message(self, cid, username, message, img=None):
         if img:
-            img.filename = f'{uuid.uuid4()}{img.filename}'
-            filename = secure_filename(img.filename)
-            from app import ROOT_DIR
-            img.save(f'{ROOT_DIR}\\static\\img\\{filename}')
-            img = f'static/img/{filename}'
+            store_image(img)
         uid = UserDAO().get_user_by_username(username)['uid']
         return self.messageDAO.insert_message(cid, uid, message, img=img)
 
@@ -115,20 +120,15 @@ class ChatHandler:
         return chat
 
     def reply_chat_message(self, data, mid):
-        try:
-            message = data['message']
-            cid = data['cid']
-        except KeyError:
-            return jsonify(msg='Missing parameter')
-        if 'img' in data:
-            img = data['img']
-        else:
-            img = None
+        message = data['message']
+        cid = data['cid']
+        img = store_image(data['img'])
         username = get_jwt_identity()
-        uid = self.userDAO.get_user_by_username(username)
-
+        uid = self.userDAO.get_user_by_username(username)['uid']
         rid = self.messageDAO.insert_reply(message, uid, mid, cid, img=img)
-        return rid
+        response_data = json.dumps({'rid': rid})
+        response_status = 201
+        return response_data, response_status
 
     def delete_chat(self, cid):
         username = get_jwt_identity()
