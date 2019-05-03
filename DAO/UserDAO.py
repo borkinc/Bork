@@ -104,9 +104,14 @@ class UserDAO(DAO):
         self.conn.commit()
 
     def get_user_password(self, username):
+        """
+        Get's password for specified user from DB
+        :param username:
+        :return:
+        """
         cursor = self.get_cursor()
         query = 'SELECT password ' \
                 'FROM users ' \
                 'WHERE username = %s'
         cursor.execute(query, (username,))
-        return cursor.fetchone()['password']
+        return cursor.fetchone()['password'] if cursor.rowcount > 0 else None
