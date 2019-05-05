@@ -5,6 +5,9 @@ from urllib.parse import urlparse
 class BaseConfig(object):
     SECRET_KEY = os.getenv('SECRET_KEY', 'bork_bork')
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'bork_bops')
+    CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME', 'djwn0kdjv')
+    API_KEY = os.getenv('CLOUDINARY_API_KEY', '824991517622736')
+    API_SECRET = os.getenv('CLOUDINARY_API_SECRET', 'ny_1wrMhCKQzmE3PF95fUMjPhEw')
 
 
 class DevelopmentConfig(BaseConfig):
