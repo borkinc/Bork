@@ -4,6 +4,7 @@ import bcrypt
 from dateutil.relativedelta import relativedelta
 from flask import jsonify, json
 from flask_jwt_extended import get_jwt_identity, create_access_token, create_refresh_token
+from psycopg2._psycopg import IntegrityError
 
 from DAO.UserDAO import UserDAO
 
@@ -65,9 +66,13 @@ class UserHandler:
         :param data: dict
         :return: JSON
         """
-
-        if data['username'] and data['username'] and data['username'] and data['username'] and data['username'] \
-                and data['username']:
+        invalid_data = {k: v for k, v in data.items() if not v}
+        if invalid_data:
+            response_data = json.dumps({
+                'message': 'These fields must be filled',
+                'fields': [k for k in invalid_data.keys()]})
+            response_status = 400
+        else:
             username = data['username']
             email = data['email']
             password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -79,20 +84,29 @@ class UserHandler:
             access_token = create_access_token(identity=username, expires_delta=datetime.timedelta(days=365))
             refresh_token = create_refresh_token(identity=username)
 
-            uid = self.dao.insert_user(username, password, first_name, last_name, email, phone_number)
-            user = {
-                'user': {
-                    'uid': uid,
-                    'username': username,
-                    'access_token': access_token,
-                    'refresh_token': refresh_token
+            try:
+                uid = self.dao.insert_user(username, password, first_name, last_name, email, phone_number)
+                user = {
+                    'user': {
+                        'uid': uid,
+                        'username': username,
+                        'access_token': access_token,
+                        'refresh_token': refresh_token
+                    }
                 }
-            }
-            response_data = json.dumps(user)
-            response_status = 200
-        else:
-            response_data = json.dumps({'message': 'All fields must be filled'})
-            response_status = 400
+                response_data = json.dumps(user)
+                response_status = 200
+            except IntegrityError:
+                response_data = json.dumps({
+                    'message': f'User with username: "{username}" exists',
+                    'fields': ['username']})
+                response_status = 400
+        # else:
+        #     response_data = json.dumps({
+        #         'message': 'All fields must be filled',
+        #         'fields': 'all'
+        #     })
+        #     response_status = 400
         return response_data, response_status
 
     def verify_password(self, data):
@@ -125,11 +139,21 @@ class UserHandler:
                     }
                 )
                 response_status = 200
+            elif user is None:
+                response_data = json.dumps({
+                    'message': f'Username: "{username}" does not exist',
+                    'fields': 'username'
+                })
+                response_status = 400
             else:
                 response_data = json.dumps({'message': 'Invalid credentials'})
                 response_status = 400
         else:
-            response_data = json.dumps({'message': 'Username and password fields cannot be blank'})
+            response_data = json.dumps(
+                {
+                    'message': 'Username and password fields cannot be blank',
+                    'fields': ['username', 'password']
+                })
             response_status = 400
         return response_data, response_status
 
