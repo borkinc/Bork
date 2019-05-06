@@ -7,3 +7,4 @@ Flask-RESTful
 flask-jwt-extended
 passlib
 python-dateutil
+cloudinary

@@ -1,5 +1,8 @@
 import uuid
 
+from cloudinary.uploader import upload
+from cloudinary.utils import cloudinary_url
+from flask import current_app as app
 from flask import jsonify, json
 from flask_jwt_extended import get_jwt_identity
 from werkzeug.utils import secure_filename
@@ -10,12 +13,17 @@ from DAO.UserDAO import UserDAO
 
 
 def store_image(img):
-    img.filename = f'{uuid.uuid4()}{img.filename}'
-    filename = secure_filename(img.filename)
-    from app import ROOT_DIR
-    img.save(f'{ROOT_DIR}\\static\\img\\{filename}')
-    img = f'static/img/{filename}'
-    return img
+    if app.config['ENV'] == 'development':
+        img.filename = f'{uuid.uuid4()}{img.filename}'
+        filename = secure_filename(img.filename)
+        from app import ROOT_DIR
+        img.save(f'{ROOT_DIR}\\static\\img\\{filename}')
+        image_url = f'static/img/{filename}'
+        return image_url
+    else:
+        upload_result = upload(img)
+        image_url, options = cloudinary_url(upload_result['public_id'], format='jpg')
+    return image_url
 
 
 class ChatHandler:
@@ -77,7 +85,7 @@ class ChatHandler:
 
     def insert_chat_message(self, cid, username, message, img=None):
         if img:
-            store_image(img)
+            img = store_image(img)
         uid = UserDAO().get_user_by_username(username)['uid']
         return self.messageDAO.insert_message(cid, uid, message, img=img)
 
