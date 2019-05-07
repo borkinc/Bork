@@ -66,9 +66,13 @@ class UserHandler:
         :param data: dict
         :return: JSON
         """
-
-        if data['username'] and data['username'] and data['username'] and data['username'] and data['username'] \
-                and data['username']:
+        invalid_data = {k: v for k, v in data.items() if not v}
+        if invalid_data:
+            response_data = json.dumps({
+                'message': 'These fields must be filled',
+                'fields': [k for k in invalid_data.keys()]})
+            response_status = 400
+        else:
             username = data['username']
             email = data['email']
             password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -93,11 +97,10 @@ class UserHandler:
                 response_data = json.dumps(user)
                 response_status = 200
             except IntegrityError:
-                response_data = json.dumps({'message': f'User with username: "{username}" exists'})
+                response_data = json.dumps({
+                    'message': f'User with username: "{username}" exists',
+                    'fields': ['username']})
                 response_status = 400
-        else:
-            response_data = json.dumps({'message': 'All fields must be filled'})
-            response_status = 400
         return response_data, response_status
 
     def verify_password(self, data):
@@ -143,7 +146,7 @@ class UserHandler:
             response_data = json.dumps(
                 {
                     'message': 'Username and password fields cannot be blank',
-                    'fields': 'all'
+                    'fields': ['username', 'password']
                 })
             response_status = 400
         return response_data, response_status
