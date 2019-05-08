@@ -1,5 +1,8 @@
 import uuid
 
+from cloudinary.uploader import upload
+from cloudinary.utils import cloudinary_url
+from flask import current_app as app
 from flask import jsonify, json
 from flask_jwt_extended import get_jwt_identity
 from werkzeug.utils import secure_filename
@@ -7,6 +10,20 @@ from werkzeug.utils import secure_filename
 from DAO.ChatDAO import ChatDAO
 from DAO.MessageDAO import MessageDAO
 from DAO.UserDAO import UserDAO
+
+
+def store_image(img):
+    if app.config['ENV'] == 'development':
+        img.filename = f'{uuid.uuid4()}{img.filename}'
+        filename = secure_filename(img.filename)
+        from app import ROOT_DIR
+        img.save(f'{ROOT_DIR}\\static\\img\\{filename}')
+        image_url = f'static/img/{filename}'
+        return image_url
+    else:
+        upload_result = upload(img)
+        image_url, options = cloudinary_url(upload_result['public_id'], format='jpg')
+    return image_url
 
 
 class ChatHandler:
@@ -51,10 +68,18 @@ class ChatHandler:
             chat_name = data['chat_name']
             username = get_jwt_identity()
             user = self.userDAO.get_user_by_username(username)
-            cid = self.chatDAO.insert_chat_group(chat_name, user['uid'])
+            if data['members'] is not None:
+                members = data['members'].split(',')
+            else:
+                members = []
+            cid, created_on = self.chatDAO.insert_chat_group(chat_name, user['uid'], members=members)
             response_data = json.dumps({
-                'chat': cid,
-                'msg': 'Success'
+                'chat': {
+                    'cid': cid,
+                    'name': chat_name,
+                    'created_on': created_on,
+                    'msg': 'Success'
+                }
             })
             response_status = 201
         else:
@@ -62,13 +87,10 @@ class ChatHandler:
             response_status = 400
         return response_data, response_status
 
-    def insert_chat_message(self, cid, uid, message, img=None):
+    def insert_chat_message(self, cid, username, message, img=None):
         if img:
-            img.filename = f'{uuid.uuid4()}{img.filename}'
-            filename = secure_filename(img.filename)
-            from app import ROOT_DIR
-            img.save(f'{ROOT_DIR}\\static\\img\\{filename}')
-            img = f'static/img/{filename}'
+            img = store_image(img)
+        uid = UserDAO().get_user_by_username(username)['uid']
         return self.messageDAO.insert_message(cid, uid, message, img=img)
 
     def add_contact_to_chat_group(self, cid, data):
@@ -110,17 +132,22 @@ class ChatHandler:
         return chat
 
     def reply_chat_message(self, data, mid):
-        try:
-            message = data['message']
-            cid = data['cid']
-        except KeyError:
-            return jsonify(msg='Missing parameter')
-        if 'img' in data:
-            img = data['img']
-        else:
-            img = None
+        message = data['message']
+        cid = data['cid']
+        img = store_image(data['img'])
         username = get_jwt_identity()
-        uid = self.userDAO.get_user_by_username(username)
-
+        uid = self.userDAO.get_user_by_username(username)['uid']
         rid = self.messageDAO.insert_reply(message, uid, mid, cid, img=img)
-        return rid
+        response_data = json.dumps({'rid': rid})
+        response_status = 201
+        return response_data, response_status
+
+    def delete_chat(self, cid):
+        username = get_jwt_identity()
+        uid = self.userDAO.get_user_by_username(username)['uid']
+        chat_owner = self.chatDAO.get_owner_of_chat(cid)[0]['uid']
+        if uid == chat_owner:
+            self.chatDAO.delete_chat(cid)
+            return jsonify(msg="Deleted")
+        else:
+            return jsonify(msg="Not ur chat >:(")

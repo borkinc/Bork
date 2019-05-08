@@ -10,18 +10,19 @@ class ChatDAO(DAO):
         :return: RealDictCursor
         """
         cursor = self.get_cursor()
-        query = 'WITH replies_query as (SELECT replied_to, array_agg(mid) AS replies_list ' \
-                'FROM replies INNER JOIN messages on replies.reply =  messages.mid GROUP BY replied_to), ' \
-                'like_count AS (SELECT mid, COUNT(*) AS likes FROM vote WHERE upvote = TRUE GROUP BY mid), ' \
-                'dislike_count AS (SELECT mid, COUNT(*) as dislikes FROM vote WHERE upvote = FALSE GROUP BY mid) ' \
-                'SELECT messages.mid, users.uid, cid, message, image, COALESCE(likes, 0) as likes, ' \
-                "COALESCE(dislikes, 0) as dislikes, username, COALESCE(replies_list, '{}') as replies, " \
-                'messages.created_on FROM messages LEFT OUTER JOIN like_count ON messages.mid = like_count.mid ' \
-                'LEFT OUTER JOIN dislike_count ON messages.mid = dislike_count.mid ' \
-                'LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid ' \
-                'LEFT OUTER JOIN replies_query ON messages.mid = replies_query.replied_to ' \
-                'WHERE messages.cid = %s ' \
-                'ORDER BY messages.created_on DESC'
+        query = "WITH replies_query as (SELECT reply, message AS replies_list " \
+                "FROM replies INNER JOIN messages on replies.replied_to =  messages.mid GROUP BY reply, message), " \
+                "like_count AS (SELECT mid, COUNT(*) AS likes FROM vote WHERE upvote = TRUE GROUP BY mid), " \
+                "dislike_count AS (SELECT mid, COUNT(*) as dislikes FROM vote WHERE upvote = FALSE GROUP BY mid) " \
+                "SELECT messages.mid, users.uid, cid, message, image, COALESCE(likes, 0) as likes, " \
+                "COALESCE(dislikes, 0) as dislikes, username, COALESCE(replies_list, NULL) as replies, " \
+                "messages.created_on " \
+                "FROM messages LEFT OUTER JOIN like_count ON messages.mid = like_count.mid " \
+                "LEFT OUTER JOIN dislike_count ON messages.mid = dislike_count.mid " \
+                "LEFT OUTER JOIN photo ON messages.mid = photo.mid INNER JOIN users on messages.uid = users.uid " \
+                "LEFT OUTER JOIN replies_query ON messages.mid = replies_query.reply " \
+                "WHERE messages.cid = %s " \
+                "ORDER BY messages.created_on DESC"
         cursor.execute(query, (cid,))
         messages = cursor.fetchall()
         return messages
@@ -58,19 +59,24 @@ class ChatDAO(DAO):
         cursor.execute(query, (cid,))
         return cursor.fetchall()
 
-    def insert_chat_group(self, chat_name, owner_id):
+    def insert_chat_group(self, chat_name, owner_id, members=[]):
         """
         Inserts a new chat group to the DB
         :param chat_name: str
         :param owner_id: int
+        :param members: list containing uids of users to add
         :return: int
         """
         cursor = self.get_cursor()
-        query = 'INSERT INTO chat_group (name, uid) VALUES (%s, %s) RETURNING cid'
+        query = 'INSERT INTO chat_group (name, uid) VALUES (%s, %s) RETURNING cid, created_on'
         cursor.execute(query, (chat_name, owner_id))
-        cid = cursor.fetchone()['cid']
+        results = cursor.fetchall()
+        cid = results[0]['cid']
+        created_on = results[0]['created_on']
         self.conn.commit()
-        return cid
+        for member in members:
+            self.insert_member(cid, member)
+        return cid, created_on
 
     def insert_member(self, cid, member_to_add):
         """
@@ -102,4 +108,10 @@ class ChatDAO(DAO):
         cursor = self.get_cursor()
         query = 'DELETE FROM chat_members WHERE cid = %s AND uid = %s'
         cursor.execute(query, (cid, member_to_remove))
+        self.conn.commit()
+
+    def delete_chat(self, cid):
+        cursor = self.get_cursor()
+        query = 'DELETE FROM chat_group WHERE cid = %s'
+        cursor.execute(query, (cid,))
         self.conn.commit()
