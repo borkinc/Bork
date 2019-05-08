@@ -86,7 +86,7 @@ class MessageDAO(DAO):
     def vote_message(self, mid, uid, upvote):
         cursor = self.get_cursor()
         query = 'insert into vote (mid, uid, upvote) values (%s, %s, %s)'
-        cursor.execute(query, (mid, uid, upvote, ))
+        cursor.execute(query, (mid, uid, upvote,))
         self.conn.commit()
 
     def get_num_messages_daily(self, date):
@@ -100,7 +100,7 @@ class MessageDAO(DAO):
     def get_num_likes_daily(self, date, like):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select count(*) as num from vote where liked_on > %s and liked_on < %s and upvote = %s"
+        query = "select count(*) as num from vote where voted_on > %s and voted_on < %s and upvote = %s"
         cursor.execute(query, (date, end_date, like))
         count = cursor.fetchall()
         return count[0]['num']
@@ -108,7 +108,7 @@ class MessageDAO(DAO):
     def get_num_replies_daily(self, date):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select count(*) as num from replies inner join messages on messages.mid = replies.reply" \
+        query = "select count(*) as num from replies inner join messages on messages.mid = replies.replied_to" \
                 " where created_on > %s and created_on < %s"
         cursor.execute(query, (date, end_date))
         count = cursor.fetchall()
@@ -117,26 +117,24 @@ class MessageDAO(DAO):
     def get_num_replies_photos_daily(self, pid, date):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select count(*) as num from replies where replies.reply = %s and created _on > %s and created_on < %s"
-        cursor.execute(query, (pid, date, end_date, ))
+        query = "select count(*) as num from replies inner join messages on messages.mid = replies.replied_to where replies.replied_to = %s and created_on > %s and created_on < %s"
+        cursor.execute(query, (pid, date, end_date,))
         count = cursor.fetchall()
         return count[0]['num']
 
     def get_num_like_photos_daily(self, pid, date, like):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select count(*) as num, vote from vote where vote.mid = %s " \
-                "and vote.upvote = %s and created_on > %s and created_on < %s"
-        cursor.execute(query, (pid, like, date, end_date, ))
+        query = "select count(*) as num from vote where vote.mid = %s " \
+                "and vote.upvote = %s and voted_on > %s and voted_on < %s"
+        cursor.execute(query, (pid, like, date, end_date,))
         count = cursor.fetchall()
         return count[0]['num']
 
     def get_trending_hashtags(self):
         cursor = self.get_cursor()
-        query = "with trending as (select count(*) as num, hid from hashtags_messages natural inner join messages " \
-                "natural inner join hashtags " \
-                "group by hid order by num desc limit 10)" \
-                "select hashtag from hashtags natural inner join trending"
+        query = "select count(*) as num, hashtag from hashtags_messages natural inner join messages " \
+                "group by hashtag order by num desc limit 10"
         cursor.execute(query)
         return cursor.fetchall()
 
@@ -148,16 +146,40 @@ class MessageDAO(DAO):
         if img:
             query = 'INSERT INTO photo (image, mid) VALUES (%s, %s)'
             cursor.execute(query, (img, message_id))
+        hastags = [mess for mess in message.split() if mess.startswith("#")]
+        for hashtag in hastags:
+            self.insert_hashtag(hashtag, message_id)
         cursor.connection.commit()
-
         return message_id
 
     def insert_reply(self, message, uid, mid, cid, img=None):
         cursor = self.get_cursor()
         rid = self.insert_message(cid, uid, message, img=img)
-        query = 'INSERT INTO replies (replied_to, reply) values (%s, %s)'
+        query = 'INSERT INTO replies (replied_to, reply) values (%s, %s) RETURNING reply'
         cursor.execute(query, (mid, rid))
-        reply_id = cursor.fetchone()['mid']
+        reply_id = cursor.fetchone()['reply']
         self.conn.commit()
         return reply_id
 
+    def insert_hashtag(self, hashtag, mid):
+        cursor = self.get_cursor()
+        query = 'INSERT INTO hashtags_messages (hashtag, mid) values (%s, %s)'
+        cursor.execute(query, (hashtag, mid))
+        self.conn.commit()
+
+    def remove_vote(self, mid, uid, upvote):
+        cursor = self.get_cursor()
+        query = "SELECT * FROM vote WHERE mid = %s and uid = %s"
+        cursor.execute(query, (mid, uid))
+        vote = [vote for vote in cursor.fetchall()]
+        delete = vote[0]['upvote'] == upvote
+
+        if delete:
+            query = "DELETE FROM vote WHERE mid = %s and uid = %s"
+            cursor.execute(query, (mid, uid))
+
+        else:
+            query = "UPDATE vote SET upvote = %s WHERE mid = %s and uid = %s"
+            cursor.execute(query, (upvote, mid, uid))
+        self.conn.commit()
+        return delete

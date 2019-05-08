@@ -29,14 +29,10 @@ class MessageHandler:
         return self.dao.get_list_of_dislikers_message(mid)
 
     def like_message(self, mid):
-        user = get_jwt_identity()
-        uid = UserDAO().get_user_by_username(user)['uid']
-        return self.dao.vote_message(mid, uid, True)
+        return self._vote_message(mid, True)
 
     def dislike_message(self, mid):
-        user = get_jwt_identity()
-        uid = UserDAO().get_user_by_username(user)['uid']
-        return self.dao.vote_message(mid, uid, False)
+        return self._vote_message(mid, False)
 
     def get_num_messages_daily(self):
         today = datetime.date.today()
@@ -54,7 +50,7 @@ class MessageHandler:
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_likes_daily(day_to_get, True)
             num_likes.append({'day': day_to_get, 'total': num})
-        return jsonify(result=num_likes)
+        return jsonify(num_likes)
 
     def get_num_dislikes_daily(self):
         today = datetime.date.today()
@@ -63,7 +59,7 @@ class MessageHandler:
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_likes_daily(day_to_get, False)
             num_dislikes.append({'day': day_to_get, 'total': num})
-        return jsonify(result=num_dislikes)
+        return jsonify(num_dislikes)
 
     def get_num_replies_daily(self):
         today = datetime.date.today()
@@ -72,7 +68,7 @@ class MessageHandler:
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_replies_daily(day_to_get)
             num_replies.append({'day': day_to_get, 'total': num})
-        return jsonify(result=num_replies)
+        return jsonify(num_replies)
 
     def get_num_replies_photo(self, pid):
         today = datetime.date.today()
@@ -81,7 +77,7 @@ class MessageHandler:
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_replies_photos_daily(pid, day_to_get)
             num_replies.append({'day': day_to_get, 'total': num})
-        return jsonify(result=num_replies)
+        return jsonify(num_replies)
 
     def get_num_likes_photo(self, pid):
         today = datetime.date.today()
@@ -90,7 +86,7 @@ class MessageHandler:
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_like_photos_daily(pid, day_to_get, True)
             num_likes.append({'day': day_to_get, 'total': num})
-        return jsonify(result=num_likes)
+        return jsonify(num_likes)
 
     def get_num_dislikes_photo(self, pid):
         today = datetime.date.today()
@@ -99,7 +95,7 @@ class MessageHandler:
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_num_like_photos_daily(pid, day_to_get, False)
             num_likes.append({'day': day_to_get, 'total': num})
-        return jsonify(result=num_likes)
+        return jsonify(num_likes)
 
     def get_trending_hashtags(self):
         trending_hashtags = []
@@ -108,3 +104,17 @@ class MessageHandler:
             trending_hashtags.append({'hashtag': hashtag['hashtag'], 'position': i + 1})
         return jsonify(trending_hashtags)
 
+    def _vote_message(self, mid, upvote):
+        user = get_jwt_identity()
+        uid = UserDAO().get_user_by_username(user)['uid']
+        try:
+            self.dao.vote_message(mid, uid, upvote)
+            msg = 'Successfully added vote'
+        except:
+            self.dao.conn.rollback()
+            deleted = self.dao.remove_vote(mid, uid, upvote)
+            if deleted:
+                msg = 'Successfully changed vote'
+            else:
+                msg = 'Successfully removed vote'
+        return msg

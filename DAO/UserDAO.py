@@ -71,15 +71,22 @@ class UserDAO(DAO):
     def get_daily_messages_user(self, date, uid):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select count(*) as num from messages where messages.uid = %s and created_on > %s and created_on < %s"
+        query = "select count(*) as num, username from messages inner join users on users.uid = messages.uid where messages.uid = %s " \
+                "and messages.created_on > %s and messages.created_on < %s group by username"
         cursor.execute(query, (uid, date, end_date,))
-        count = cursor.fetchall()
-        return count[0]['num']
+        count = cursor.fetchone()
+        if count:
+            return count
+        else:
+            user = self.get_user(uid)[0]
+            return {'num': 0, 'username': user['username']}
 
     def get_daily_active_users(self, date):
         cursor = self.get_cursor()
         end_date = date + relativedelta(days=1)
-        query = "select username from messages natural inner join users where created_on > %s and created_on < %s"
+        query = "WITH top_users AS (SELECT COUNT(*) AS amount, username FROM messages INNER JOIN users ON messages.uid = users.uid " \
+                "WHERE messages.created_on > %s AND messages.created_on < %s GROUP BY username ORDER BY amount  )" \
+                "SELECT username FROM top_users LIMIT 10 "
         cursor.execute(query, (date, end_date))
         users = cursor.fetchall()
         return users
@@ -97,9 +104,14 @@ class UserDAO(DAO):
         self.conn.commit()
 
     def get_user_password(self, username):
+        """
+        Get's password for specified user from DB
+        :param username:
+        :return:
+        """
         cursor = self.get_cursor()
         query = 'SELECT password ' \
                 'FROM users ' \
                 'WHERE username = %s'
         cursor.execute(query, (username,))
-        return cursor.fetchone()['password']
+        return cursor.fetchone()['password'] if cursor.rowcount > 0 else None

@@ -107,6 +107,7 @@ class Chats(Resource):
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('chat_name', help=HELP_TEXT, required=True)
+        parser.add_argument('members')
         data = parser.parse_args()
         response, status = self.handler.insert_chat(data)
         return app.response_class(response=response, status=status, mimetype='application/json')
@@ -177,11 +178,9 @@ class Chat(Resource):
         chat = ChatHandler().add_contact_to_chat_group(cid, data)
         return jsonify(chat=chat)
 
-    # @jwt_required
+    @jwt_required
     def delete(self, cid):
-        data = self.parser.parse_args()
-        chat = ChatHandler().remove_contact_from_chat_group(1)
-        return jsonify(chat=chat)
+        return ChatHandler().delete_chat(cid)
 
 
 class ChatMembers(Resource):
@@ -231,10 +230,12 @@ class ChatMessages(Resource):
         parser.add_argument('message', help=HELP_TEXT, required=True)
         data = parser.parse_args()
         if 'img' in request.files and request.files['img']:
-            message = ChatHandler().insert_chat_message(cid=chat_id, uid=data['uid'], message=data['message'],
+            message = ChatHandler().insert_chat_message(cid=chat_id, username=get_jwt_identity(),
+                                                        message=data['message'],
                                                         img=request.files['img'])
         else:
-            message = ChatHandler().insert_chat_message(cid=chat_id, uid=data['uid'], message=data['message'])
+            message = ChatHandler().insert_chat_message(cid=chat_id, username=get_jwt_identity(),
+                                                        message=data['message'])
         return jsonify(message=message)
 
 
@@ -301,11 +302,11 @@ class ReplyChatMessage(Resource):
     def post(self, mid):
         parser = reqparse.RequestParser()
         parser.add_argument('message', help=HELP_TEXT, required=True)
-        parser.add_argument('img')
-        parser.add_argument('cid')
+        parser.add_argument('cid', help=HELP_TEXT, required=True)
         data = parser.parse_args()
-        message = ChatHandler().reply_chat_message(data, mid)
-        return jsonify(message=message)
+        data['img'] = request.files['img'] or None
+        response, status = ChatHandler().reply_chat_message(data, mid)
+        return app.response_class(response=response, status=status, mimetype='application/json')
 
 
 class TokenRefresh(Resource):

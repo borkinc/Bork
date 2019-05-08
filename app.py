@@ -1,5 +1,6 @@
 import os
 
+import cloudinary
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -13,10 +14,12 @@ from resources import UserRegistration, TokenRefresh, UserLogin, Chats, Index, C
 app = Flask(__name__)
 config = f'config.config.{os.getenv("FLASK_SETTINGS")}'
 app.config.from_object(config)
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+cors = CORS(app, resources={r"*": {"origins": "*"}})
 api = Api(app, prefix='/api')
 jwt = JWTManager(app)
-
+if app.config['ENV'] == 'production':
+    cloudinary.config(cloud_name=app.config['CLOUD_NAME'], api_key=app.config['API_KEY'],
+                      api_secret=app.config['API_SECRET'])
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
