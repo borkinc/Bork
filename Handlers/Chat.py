@@ -72,10 +72,14 @@ class ChatHandler:
                 members = data['members'].split(',')
             else:
                 members = []
-            cid = self.chatDAO.insert_chat_group(chat_name, user['uid'], members=members)
+            cid, created_on = self.chatDAO.insert_chat_group(chat_name, user['uid'], members=members)
             response_data = json.dumps({
-                'chat': cid,
-                'msg': 'Success'
+                'chat': {
+                    'cid': cid,
+                    'name': chat_name,
+                    'created_on': created_on,
+                    'msg': 'Success'
+                }
             })
             response_status = 201
         else:

@@ -17,8 +17,9 @@ app.config.from_object(config)
 cors = CORS(app, resources={r"*": {"origins": "*"}})
 api = Api(app, prefix='/api')
 jwt = JWTManager(app)
-cloudinary.config(cloud_name=app.config['CLOUD_NAME'], api_key=app.config['API_KEY'],
-                  api_secret=app.config['API_SECRET'])
+if app.config['ENV'] == 'production':
+    cloudinary.config(cloud_name=app.config['CLOUD_NAME'], api_key=app.config['API_KEY'],
+                      api_secret=app.config['API_SECRET'])
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 

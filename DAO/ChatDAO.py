@@ -68,13 +68,15 @@ class ChatDAO(DAO):
         :return: int
         """
         cursor = self.get_cursor()
-        query = 'INSERT INTO chat_group (name, uid) VALUES (%s, %s) RETURNING cid'
+        query = 'INSERT INTO chat_group (name, uid) VALUES (%s, %s) RETURNING cid, created_on'
         cursor.execute(query, (chat_name, owner_id))
-        cid = cursor.fetchone()['cid']
+        results = cursor.fetchall()
+        cid = results[0]['cid']
+        created_on = results[0]['created_on']
         self.conn.commit()
         for member in members:
             self.insert_member(cid, member)
-        return cid
+        return cid, created_on
 
     def insert_member(self, cid, member_to_add):
         """
@@ -111,5 +113,5 @@ class ChatDAO(DAO):
     def delete_chat(self, cid):
         cursor = self.get_cursor()
         query = 'DELETE FROM chat_group WHERE cid = %s'
-        cursor.execute(query, (cid, ))
+        cursor.execute(query, (cid,))
         self.conn.commit()
