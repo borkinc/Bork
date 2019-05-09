@@ -101,12 +101,6 @@ class UserHandler:
                     'message': f'User with username: "{username}" exists',
                     'fields': ['username']})
                 response_status = 400
-        # else:
-        #     response_data = json.dumps({
-        #         'message': 'All fields must be filled',
-        #         'fields': 'all'
-        #     })
-        #     response_status = 400
         return response_data, response_status
 
     def verify_password(self, data):
