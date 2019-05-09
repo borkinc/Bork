@@ -1,6 +1,6 @@
 from dateutil.relativedelta import relativedelta
 
-from DAO.DAO import DAO
+from DAO.dao import DAO
 
 
 class MessageDAO(DAO):

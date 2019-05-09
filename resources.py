@@ -2,9 +2,9 @@ from flask import jsonify, request, current_app as app
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_restful import Resource, reqparse
 
-from Handlers.Chat import ChatHandler
-from Handlers.Message import MessageHandler
-from Handlers.Users import UserHandler
+from Handlers.chat import ChatHandler
+from Handlers.message import MessageHandler
+from Handlers.users import UserHandler
 
 HELP_TEXT = 'This field cannot be blank'
 

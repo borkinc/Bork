@@ -7,9 +7,9 @@ from flask import jsonify, json
 from flask_jwt_extended import get_jwt_identity
 from werkzeug.utils import secure_filename
 
-from DAO.ChatDAO import ChatDAO
-from DAO.MessageDAO import MessageDAO
-from DAO.UserDAO import UserDAO
+from DAO.chat_dao import ChatDAO
+from DAO.message_dao import MessageDAO
+from DAO.user_dao import UserDAO
 
 
 def store_image(img):
@@ -72,7 +72,8 @@ class ChatHandler:
                 members = data['members'].split(',')
             else:
                 members = []
-            cid, created_on = self.chatDAO.insert_chat_group(chat_name, user['uid'], members=members)
+            cid, created_on = self.chatDAO.insert_chat_group(chat_name, user['uid'],
+                                                             members=members)
             response_data = json.dumps({
                 'chat': {
                     'cid': cid,

@@ -1,5 +1,5 @@
 # Bork
-A simple database application for photo messaging in a social context, like Instagram but based on chat groups.
+Bork is a simple database application for photo messaging in a social context, like Instagram but based on chat groups. This repository holds the server-side implementation of the app. The data in the application is managed by a relational database system and exposed to client applications through a REST API. Moreover, the implementation conforms to a Model-View-Controller design pattern.
 
 ### Objectives
 * Understand the design, implementation and use of an application backed by a database system.

@@ -6,7 +6,7 @@ from flask import jsonify, json
 from flask_jwt_extended import get_jwt_identity, create_access_token, create_refresh_token
 from psycopg2._psycopg import IntegrityError
 
-from DAO.UserDAO import UserDAO
+from DAO.user_dao import UserDAO
 
 
 class UserHandler:

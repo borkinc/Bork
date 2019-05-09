@@ -4,8 +4,8 @@ from dateutil.relativedelta import relativedelta
 from flask import jsonify
 from flask_jwt_extended import get_jwt_identity
 
-from DAO.MessageDAO import MessageDAO
-from DAO.UserDAO import UserDAO
+from DAO.message_dao import MessageDAO
+from DAO.user_dao import UserDAO
 
 
 class MessageHandler:

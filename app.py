@@ -6,71 +6,73 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
-from Handlers.Message import MessageHandler
-from Handlers.Users import UserHandler
-from resources import UserRegistration, TokenRefresh, UserLogin, Chats, Index, ChatMessages, Contacts, Users, Chat, \
-    LikeChatMessage, DislikeChatMessage, ReplyChatMessage, User, Contact, Messages, Message, ChatMembers
+from Handlers.message import MessageHandler
+from Handlers.users import UserHandler
+from resources import UserRegistration, TokenRefresh, UserLogin, Chats, \
+    Index, ChatMessages, Contacts, Users, Chat, \
+    LikeChatMessage, DislikeChatMessage, ReplyChatMessage, \
+    User, Contact, Messages, Message, ChatMembers
 
-app = Flask(__name__)
+APP = Flask(__name__)
 config = f'config.config.{os.getenv("FLASK_SETTINGS")}'
-app.config.from_object(config)
-cors = CORS(app, resources={r"*": {"origins": "*"}})
-api = Api(app, prefix='/api')
-jwt = JWTManager(app)
-if app.config['ENV'] == 'production':
-    cloudinary.config(cloud_name=app.config['CLOUD_NAME'], api_key=app.config['API_KEY'],
-                      api_secret=app.config['API_SECRET'])
+APP.config.from_object(config)
+cors = CORS(APP, resources={r"*": {"origins": "*"}})
+api = Api(APP, prefix='/api')
+jwt = JWTManager(APP)
+if APP.config['ENV'] == 'production':
+    cloudinary.config(cloud_name=APP.config['CLOUD_NAME'], api_key=APP.config['API_KEY'],
+                      api_secret=APP.config['API_SECRET'])
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 # ------------------------statistics-------------------------------
 
-@app.route('/stats/trending')
+@APP.route('/stats/trending')
 def trending_topics():
     return MessageHandler().get_trending_hashtags(), 200
 
 
-@app.route('/stats/messages')
+@APP.route('/stats/messages')
 def num_of_posts():
     return MessageHandler().get_num_messages_daily(), 200
 
 
-@app.route('/stats/likes')
+@APP.route('/stats/likes')
 def num_of_likes():
     return MessageHandler().get_num_likes_daily(), 200
 
 
-@app.route('/stats/replies')
+@APP.route('/stats/replies')
 def num_of_replies():
     return MessageHandler().get_num_replies_daily(), 200
 
 
-@app.route('/stats/dislikes')
+@APP.route('/stats/dislikes')
 def num_of_dislikes():
     return MessageHandler().get_num_dislikes_daily(), 200
 
 
-@app.route('/stats/active')
+@APP.route('/stats/active')
 def active_users():
     return UserHandler().get_daily_active_users(), 200
 
 
-@app.route('/stats/users/<int:uid>/messages')
+@APP.route('/stats/users/<int:uid>/messages')
 def num_of_mess_per_day(uid):
     return UserHandler().get_num_messages_user(uid)
 
 
-@app.route('/stats/photos/<int:pid>/replies')
+@APP.route('/stats/photos/<int:pid>/replies')
 def num_of_replies_photo(pid):
     return MessageHandler().get_num_replies_photo(pid)
 
 
-@app.route('/stats/photos/<int:pid>/likes')
+@APP.route('/stats/photos/<int:pid>/likes')
 def num_of_likes_photos(pid):
     return MessageHandler().get_num_likes_photo(pid)
 
 
-@app.route('/stats/photos/<int:pid>/dislikes')
+@APP.route('/stats/photos/<int:pid>/dislikes')
 def num_of_dislikes_photos(pid):
     return MessageHandler().get_num_dislikes_photo(pid)
 
@@ -94,4 +96,4 @@ api.add_resource(ReplyChatMessage, '/messages/<int:mid>/replies')
 api.add_resource(TokenRefresh, '/token/refresh')
 
 if __name__ == '__main__':
-    app.run()
+    APP.run()
