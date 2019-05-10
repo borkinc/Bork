@@ -8,3 +8,4 @@ flask-jwt-extended
 passlib
 python-dateutil
 cloudinary
+pylint
