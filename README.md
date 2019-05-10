@@ -1,4 +1,5 @@
-![Logo](https://github.com/borkinc/BorkGUI/blob/master/src/img/dog.svg =32x32)
+<img src="https://github.com/borkinc/BorkGUI/blob/master/src/img/dog.svg" width="200" height="200">
+
 # Bork
 
 ![Code Quality](https://img.shields.io/badge/pylint-8.93%2F10-brightgreen.svg)
