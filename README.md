@@ -1,4 +1,6 @@
-<img src="https://github.com/borkinc/BorkGUI/blob/master/src/img/dog.svg" width="200" height="200">
+<p align="center">
+    <img src="https://github.com/borkinc/BorkGUI/blob/master/src/img/dog.svg" width="200" height="200">
+</p>
 
 # Bork
 
