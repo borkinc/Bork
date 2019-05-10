@@ -1,9 +1,27 @@
+<p align="center">
+    <img src="https://github.com/borkinc/BorkGUI/blob/master/src/img/dog.svg" width="200" height="200">
+</p>
+
 # Bork
 
 ![Code Quality](https://img.shields.io/badge/pylint-8.93%2F10-brightgreen.svg)
 
 Bork is a simple database application for photo messaging in a social context, like Instagram but based on chat groups. This repository holds the server-side implementation of the app. The data in the application is managed by a relational database system and exposed to client applications through a REST API. Moreover, the implementation conforms to a Model-View-Controller design pattern.
  
+## Table of Contents
+* [Technologies](#technologies)
+* Installation
+* License
+* Authors and Acknowledgement
+
+## Technologies
+* [Python3.6](https://www.python.org/downloads/) - interpreted, high-level, general-purpose programming language
+* [Flask](https://github.com/pallets/flask) - micro web framework written in Python
+* [Psycopg2](http://initd.org/psycopg/) - PostgreSQL adapter for the Python
+* [Gunicorn](https://gunicorn.org/) - Python Web Server Gateway Interface HTTP server
+* [Cloudinary](https://github.com/cloudinary/pycloudinary) - cloud-based image and video management solution
+* [Pylint](https://www.pylint.org/) - source-code, bug and quality checker for the Python programming language  
+
 ## Installation
 [Python3.6](https://www.python.org/downloads/) must be installed and in **PATH**
 
