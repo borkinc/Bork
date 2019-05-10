@@ -7,31 +7,36 @@ from flask import jsonify, json
 from flask_jwt_extended import get_jwt_identity
 from werkzeug.utils import secure_filename
 
-from DAO.chat_dao import ChatDAO
-from DAO.message_dao import MessageDAO
-from DAO.user_dao import UserDAO
+from dao.chat_dao import ChatDAO
+from dao.message_dao import MessageDAO
+from dao.user_dao import UserDAO
 
 
 def store_image(img):
+    """
+    Stores image in cloudinary when running on production mode, otherwise,
+    image is stored in the static img diractory
+    :param img: File
+    :return: str
+    """
     if app.config['ENV'] == 'development':
         img.filename = f'{uuid.uuid4()}{img.filename}'
         filename = secure_filename(img.filename)
         from app import ROOT_DIR
         img.save(f'{ROOT_DIR}\\static\\img\\{filename}')
         image_url = f'static/img/{filename}'
-        return image_url
     else:
         upload_result = upload(img)
-        image_url, options = cloudinary_url(upload_result['public_id'], format='jpg')
+        image_url = cloudinary_url(upload_result['public_id'], format='jpg')
     return image_url
 
 
 class ChatHandler:
 
     def __init__(self):
-        self.chatDAO = ChatDAO()
-        self.messageDAO = MessageDAO()
-        self.userDAO = UserDAO()
+        self.chat_dao = ChatDAO()
+        self.message_dao = MessageDAO()
+        self.user_dao = UserDAO()
 
     def get_chats(self):
         """
@@ -39,24 +44,44 @@ class ChatHandler:
         :return: tuple
         """
         username = get_jwt_identity()
-        user = self.userDAO.get_user_by_username(username)
-        chats = self.chatDAO.get_user_chats(user['uid'])
+        user = self.user_dao.get_user_by_username(username)
+        chats = self.chat_dao.get_user_chats(user['uid'])
         response_data = json.dumps({'chats': chats})
         response_status = 200
         return response_data, response_status
 
     def get_chat(self, cid):
-        chat = self.chatDAO.get_chat(cid)
+        """
+        Gets chat from database with given chat id
+        :param cid: int
+        :return: RealDictCursor
+        """
+        chat = self.chat_dao.get_chat(cid)
         return chat
 
     def get_chat_messages(self, cid):
-        return self.chatDAO.get_chat_messages(cid)
+        """
+        Gets messages pertaining to chat with given id
+        :param cid: int
+        :return: RealDictCursor
+        """
+        return self.chat_dao.get_chat_messages(cid)
 
     def get_chat_members(self, cid):
-        return self.chatDAO.get_members_from_chat(cid)
+        """
+        Gets chat members of given chat id
+        :param cid: int
+        :return: RealDictCursor
+        """
+        return self.chat_dao.get_members_from_chat(cid)
 
     def get_chat_owner(self, cid):
-        return self.chatDAO.get_owner_of_chat(cid)
+        """
+        Gets owner of chat with given id
+        :param cid: int
+        :return: RealDictCursor
+        """
+        return self.chat_dao.get_owner_of_chat(cid)
 
     def insert_chat(self, data):
         """
@@ -67,13 +92,13 @@ class ChatHandler:
         if 'chat_name' in data and data['chat_name']:
             chat_name = data['chat_name']
             username = get_jwt_identity()
-            user = self.userDAO.get_user_by_username(username)
+            user = self.user_dao.get_user_by_username(username)
             if data['members'] is not None:
                 members = data['members'].split(',')
             else:
                 members = []
-            cid, created_on = self.chatDAO.insert_chat_group(chat_name, user['uid'],
-                                                             members=members)
+            cid, created_on = self.chat_dao.insert_chat_group(chat_name, user['uid'],
+                                                              members=members)
             response_data = json.dumps({
                 'chat': {
                     'cid': cid,
@@ -89,66 +114,90 @@ class ChatHandler:
         return response_data, response_status
 
     def insert_chat_message(self, cid, username, message, img=None):
+        """
+        Adds a new message to database
+        :param cid: int
+        :param username: str
+        :param message: str
+        :param img: File
+        :return: RealDictCursor
+        """
         if img:
             img = store_image(img)
         uid = UserDAO().get_user_by_username(username)['uid']
-        return self.messageDAO.insert_message(cid, uid, message, img=img)
+        return self.message_dao.insert_message(cid, uid, message, img=img)
 
     def add_contact_to_chat_group(self, cid, data):
+        """
+        Adds a contact from current user's contacts list to a chat group
+        :param cid: int
+        :param data: dict
+        :return: tuple
+        """
         current_user_username = get_jwt_identity()
-        current_user_uid = self.userDAO.get_user_by_username(current_user_username)['uid']
+        current_user_uid = self.user_dao.get_user_by_username(current_user_username)['uid']
         user_to_add = data['contact_id']
-        chat_owner_uid = self.chatDAO.get_owner_of_chat(cid)[0]['uid']
+        chat_owner_uid = self.chat_dao.get_owner_of_chat(cid)[0]['uid']
 
         if chat_owner_uid != current_user_uid:
             response_data = json.dumps({'msg': 'Not owner of chat'})
             response_status = 403
         else:
-            self.chatDAO.insert_member(cid, user_to_add)
+            self.chat_dao.insert_member(cid, user_to_add)
             response_data = json.dumps({'msg': 'Success'})
             response_status = 201
         return response_data, response_status
 
     def remove_contact_from_chat_group(self, cid, data):
+        """
+        Removes a contact from current user's contacts list from chat group
+        :param cid: int
+        :param data: dict
+        :return: tuple
+        """
         current_user_username = get_jwt_identity()
-        current_user_uid = self.userDAO.get_user_by_username(current_user_username)['uid']
+        current_user_uid = self.user_dao.get_user_by_username(current_user_username)['uid']
         user_to_remove = data['contact_id']
-        chat_owner_uid = self.chatDAO.get_owner_of_chat(cid)[0]['uid']
+        chat_owner_uid = self.chat_dao.get_owner_of_chat(cid)[0]['uid']
 
         if chat_owner_uid != current_user_uid:
             response_data = json.dumps({'msg': 'Not owner of chat'})
             response_status = 403
         else:
-            self.chatDAO.remove_member(cid, user_to_remove)
+            self.chat_dao.remove_member(cid, user_to_remove)
             response_data = json.dumps({'msg': 'Success'})
             response_status = 201
         return response_data, response_status
 
-    def remove_chat(self, cid):
-        chat = {
-            'cid': 1,
-            'name': 'skiribops',
-            'participants': []
-        }
-        return chat
-
     def reply_chat_message(self, data, mid):
+        """
+        Adds a reply to an existing message
+        :param data: dict
+        :param mid: int
+        :return: tuple
+        """
         message = data['message']
         cid = data['cid']
         img = store_image(data['img'])
         username = get_jwt_identity()
-        uid = self.userDAO.get_user_by_username(username)['uid']
-        rid = self.messageDAO.insert_reply(message, uid, mid, cid, img=img)
+        uid = self.user_dao.get_user_by_username(username)['uid']
+        rid = self.message_dao.insert_reply(message, uid, mid, cid, img=img)
         response_data = json.dumps({'rid': rid})
         response_status = 201
         return response_data, response_status
 
     def delete_chat(self, cid):
+        """
+        Deletes an existing chat
+        :param cid: int
+        :return: JSON
+        """
         username = get_jwt_identity()
-        uid = self.userDAO.get_user_by_username(username)['uid']
-        chat_owner = self.chatDAO.get_owner_of_chat(cid)[0]['uid']
+        uid = self.user_dao.get_user_by_username(username)['uid']
+        chat_owner = self.chat_dao.get_owner_of_chat(cid)[0]['uid']
         if uid == chat_owner:
-            self.chatDAO.delete_chat(cid)
-            return jsonify(msg="Deleted")
+            self.chat_dao.delete_chat(cid)
+            msg = 'Deleted'
         else:
-            return jsonify(msg="Not ur chat >:(")
+            msg = 'Not ur chat >:('
+        return jsonify(msg=msg)

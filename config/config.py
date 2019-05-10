@@ -2,7 +2,7 @@ import os
 from urllib.parse import urlparse
 
 
-class BaseConfig(object):
+class BaseConfig:
     SECRET_KEY = os.getenv('SECRET_KEY', 'bork_bork')
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'bork_bops')
 

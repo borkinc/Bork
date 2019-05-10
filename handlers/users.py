@@ -6,7 +6,7 @@ from flask import jsonify, json
 from flask_jwt_extended import get_jwt_identity, create_access_token, create_refresh_token
 from psycopg2._psycopg import IntegrityError
 
-from DAO.user_dao import UserDAO
+from dao.user_dao import UserDAO
 
 
 class UserHandler:
@@ -20,18 +20,42 @@ class UserHandler:
         self.dao = UserDAO()
 
     def get_users(self):
+        """
+        Gets all users
+        :return: RealDictCursor
+        """
         return self.dao.get_all_users()
 
     def get_user_by_username(self, username):
+        """
+        Gets user by username
+        :param username: str
+        :return: RealDictCursor
+        """
         return self.dao.get_user_by_username(username)
 
     def get_user_by_id(self, uid):
+        """
+        Gets user by id
+        :param uid: int
+        :return: RealDictCursor
+        """
         return self.dao.get_user(uid)
 
     def get_contacts(self, user_id):
+        """
+        Gets user contacts
+        :param user_id: int
+        :return: RealDictCursor
+        """
         return self.dao.get_contacts(user_id)
 
     def insert_contact(self, data):
+        """
+        Adds new contact for user
+        :param data: dict
+        :return: RealDictCursor
+        """
         owner_username = get_jwt_identity()
         owner_user = self.dao.get_user_by_username(owner_username)['uid']
         try:
@@ -62,7 +86,7 @@ class UserHandler:
 
     def insert_user(self, data):
         """
-        Handles user data to be sent to the DAO for further actions
+        Handles user data to be sent to the dao for further actions
         :param data: dict
         :return: JSON
         """
@@ -75,17 +99,20 @@ class UserHandler:
         else:
             username = data['username']
             email = data['email']
-            password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            password = bcrypt.hashpw(data['password'].encode('utf-8'),
+                                     bcrypt.gensalt()).decode('utf-8')
             first_name = data['first_name']
             last_name = data['last_name']
             phone_number = data['phone_number']
 
             # Generates JWT access and refresh tokens for user.
-            access_token = create_access_token(identity=username, expires_delta=datetime.timedelta(days=365))
+            access_token = create_access_token(identity=username,
+                                               expires_delta=datetime.timedelta(days=365))
             refresh_token = create_refresh_token(identity=username)
 
             try:
-                uid = self.dao.insert_user(username, password, first_name, last_name, email, phone_number)
+                uid = self.dao.insert_user(username, password, first_name,
+                                           last_name, email, phone_number)
                 user = {
                     'user': {
                         'uid': uid,
@@ -140,7 +167,10 @@ class UserHandler:
                 })
                 response_status = 400
             else:
-                response_data = json.dumps({'message': 'Invalid credentials'})
+                response_data = json.dumps({
+                    'message': 'Invalid credentials',
+                    'fields': ['username', 'password']
+                })
                 response_status = 400
         else:
             response_data = json.dumps(
@@ -152,11 +182,22 @@ class UserHandler:
         return response_data, response_status
 
     def update_user_username(self, username, new_username):
+        """
+        Updates username
+        :param username: str
+        :param new_username: str
+        :return: RealDictCursor
+        """
         user = self.get_user_by_username(username)
         user['username'] = new_username
         return user
 
     def remove_contact(self, data):
+        """
+        Removes contact from users contacts list
+        :param data: dict
+        :return: JSON
+        """
         contact_id = data['contact_id']
         username = get_jwt_identity()
         uid = self.dao.get_user_by_username(username)['uid']
@@ -165,6 +206,10 @@ class UserHandler:
         return jsonify(contacts=new_contacts)
 
     def get_daily_active_users(self):
+        """
+        Gets daily active users
+        :return: JSON
+        """
         today = datetime.datetime.today()
         users = []
         for i in range(7):
@@ -174,10 +219,19 @@ class UserHandler:
         return jsonify(users)
 
     def get_num_messages_user(self, uid):
+        """
+        Gets daily number of messages posted by user
+        :param uid: int
+        :return: JSON
+        """
         today = datetime.datetime.today()
         num_messages = []
         for i in range(7):
             day_to_get = today - relativedelta(days=i)
             num = self.dao.get_daily_messages_user(day_to_get, uid)
-            num_messages.append({'username': num['username'], 'day': day_to_get, 'total': num['num']})
+            num_messages.append({
+                'username': num['username'],
+                'day': day_to_get,
+                'total': num['num']
+            })
         return jsonify(num_messages)

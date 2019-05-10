@@ -2,9 +2,9 @@ from flask import jsonify, request, current_app as app
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_restful import Resource, reqparse
 
-from Handlers.chat import ChatHandler
-from Handlers.message import MessageHandler
-from Handlers.users import UserHandler
+from handlers.chat import ChatHandler
+from handlers.message import MessageHandler
+from handlers.users import UserHandler
 
 HELP_TEXT = 'This field cannot be blank'
 
@@ -111,14 +111,6 @@ class Chats(Resource):
         data = parser.parse_args()
         response, status = self.handler.insert_chat(data)
         return app.response_class(response=response, status=status, mimetype='application/json')
-
-    @jwt_required
-    def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('cid')
-        data = parser.parse_args()
-        chat = ChatHandler().remove_chat(cid=1)
-        return jsonify(chat=chat, msg='Successfully removed chat')
 
 
 class Contacts(Resource):

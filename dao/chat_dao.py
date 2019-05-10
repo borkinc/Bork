@@ -1,4 +1,4 @@
-from DAO.dao import DAO
+from dao.dao import DAO
 
 
 class ChatDAO(DAO):
@@ -31,12 +31,21 @@ class ChatDAO(DAO):
         return messages
 
     def get_all_chats(self):
+        """
+        Gets all chats from database
+        :return: RealDictCursor
+        """
         cursor = self.get_cursor()
         query = "select * from chat_group"
         cursor.execute(query)
         return cursor.fetchall()
 
     def get_chat(self, cid):
+        """
+        Gets chat with given id from database
+        :param cid: int
+        :return: RealDictCursor
+        """
         cursor = self.get_cursor()
         query = 'SELECT chat_group.cid, chat_group.name, chat_group.uid, ' \
                 'messages.message, messages.created_on, chat_group.uid ' \
@@ -46,6 +55,11 @@ class ChatDAO(DAO):
         return cursor.fetchall()
 
     def get_members_from_chat(self, cid):
+        """
+        Gets chat members from specified chat
+        :param cid: int
+        :return: RealDictCursor
+        """
         cursor = self.get_cursor()
         query = 'WITH ChatMembers as (SELECT cid, uid FROM chat_members ' \
                 'UNION SELECT cid, uid FROM chat_group)' \
@@ -56,6 +70,11 @@ class ChatDAO(DAO):
         return cursor.fetchall()
 
     def get_owner_of_chat(self, cid):
+        """
+        Gets owner of chat from database
+        :param cid: int
+        :return: RealDictCursor
+        """
         cursor = self.get_cursor()
         query = 'SELECT users.uid, users.username, users.first_name, users.last_name, ' \
                 'users.email, users.phone_number ' \
@@ -64,7 +83,7 @@ class ChatDAO(DAO):
         cursor.execute(query, (cid,))
         return cursor.fetchall()
 
-    def insert_chat_group(self, chat_name, owner_id, members=[]):
+    def insert_chat_group(self, chat_name, owner_id, members=None):
         """
         Inserts a new chat group to the DB
         :param chat_name: str
@@ -78,9 +97,10 @@ class ChatDAO(DAO):
         results = cursor.fetchall()
         cid = results[0]['cid']
         created_on = results[0]['created_on']
-        self.conn.commit()
-        for member in members:
-            self.insert_member(cid, member)
+        self.commit()
+        if members:
+            for member in members:
+                self.insert_member(cid, member)
         return cid, created_on
 
     def insert_member(self, cid, member_to_add):
@@ -92,7 +112,7 @@ class ChatDAO(DAO):
         cursor = self.get_cursor()
         query = "insert into chat_members (cid, uid) values (%s, %s)"
         cursor.execute(query, (cid, member_to_add,))
-        self.conn.commit()
+        self.commit()
 
     def get_user_chats(self, uid):
         """
@@ -110,13 +130,22 @@ class ChatDAO(DAO):
         return cursor.fetchall()
 
     def remove_member(self, cid, member_to_remove):
+        """
+        Removes chat member from specified chat
+        :param cid: int
+        :param member_to_remove: int
+        """
         cursor = self.get_cursor()
         query = 'DELETE FROM chat_members WHERE cid = %s AND uid = %s'
         cursor.execute(query, (cid, member_to_remove))
-        self.conn.commit()
+        self.commit()
 
     def delete_chat(self, cid):
+        """
+        Deletes chat from database
+        :param cid: int
+        """
         cursor = self.get_cursor()
         query = 'DELETE FROM chat_group WHERE cid = %s'
         cursor.execute(query, (cid,))
-        self.conn.commit()
+        self.commit()
