@@ -296,7 +296,9 @@ class ReplyChatMessage(Resource):
         parser.add_argument('message', help=HELP_TEXT, required=True)
         parser.add_argument('cid', help=HELP_TEXT, required=True)
         data = parser.parse_args()
-        data['img'] = request.files['img'] or None
+        data['img'] = None
+        if 'img' in request.files and request.files['img']:
+            data['img'] = request.files['img']
         response, status = ChatHandler().reply_chat_message(data, mid)
         return app.response_class(response=response, status=status, mimetype='application/json')
 
