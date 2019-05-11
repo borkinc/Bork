@@ -6,8 +6,8 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
-from Handlers.message import MessageHandler
-from Handlers.users import UserHandler
+from handlers.message import MessageHandler
+from handlers.users import UserHandler
 from resources import UserRegistration, TokenRefresh, UserLogin, Chats, \
     Index, ChatMessages, Contacts, Users, Chat, \
     LikeChatMessage, DislikeChatMessage, ReplyChatMessage, \
