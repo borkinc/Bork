@@ -178,7 +178,7 @@ class ChatHandler:
         """
         message = data['message']
         cid = data['cid']
-        img = store_image(data['img'])
+        img = store_image(data['img']) if data['img'] else None
         username = get_jwt_identity()
         uid = self.user_dao.get_user_by_username(username)['uid']
         rid = self.message_dao.insert_reply(message, uid, mid, cid, img=img)
