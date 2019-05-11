@@ -27,7 +27,7 @@ def store_image(img):
         image_url = f'static/img/{filename}'
     else:
         upload_result = upload(img)
-        image_url = cloudinary_url(upload_result['public_id'], format='jpg')
+        image_url = cloudinary_url(upload_result['public_id'], format='jpg')[0]
     return image_url
 
 
