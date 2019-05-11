@@ -132,7 +132,7 @@ class UserDAO(DAO):
         query = 'WITH top_users AS (SELECT COUNT(*) AS amount, username ' \
                 'FROM messages INNER JOIN users ON messages.uid = users.uid ' \
                 'WHERE messages.created_on > %s AND messages.created_on < %s ' \
-                'GROUP BY username ORDER BY amount)' \
+                'GROUP BY username ORDER BY amount DESC)' \
                 'SELECT username FROM top_users LIMIT 10 '
         cursor.execute(query, (date, end_date))
         users = cursor.fetchall()
